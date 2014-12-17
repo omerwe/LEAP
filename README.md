@@ -46,7 +46,7 @@ python calc_h2.py --bfilesim <Plink base file> --extractSim <SNPs used for herit
 ```
 python probit.py --bfilesim <Plink base file> --pheno <phenotype file> --prev <prevalence> --extractSim <SNPs used in the heritability estimation> --out <output base file> --related <relatedness file> --h2 <heritability>
 ```
- This script creates a file called <output base file>.liabs, with estimated liabilities for every individual. The estimated liabilities can be used directly for GWAS by using them as a standard phenotype file.
+ This script creates a file called \<output base file\>.liabs, with estimated liabilities for every individual. The estimated liabilities can be used directly for GWAS by using them as a standard phenotype file.
 
 4) Compute GWAS:
 ```
@@ -74,5 +74,5 @@ for instructions.
  
 3. A complete end-to-end usage example is provided with the LEAP source files, and can be invoked via the script leap_pipeline.sh.
 This example estimates liabilities for a small balanced case-control dataset.
-The dataset was simulated with 50% heritability and  0.1% prevalence. It included 500 cases, 500 controls, 499 causal SNPs, 100 unusually differentiated SNPs and 10000 SNPs differentiated with FST=0.01. Causal SNPs are called csnp<i>, and unusually differentiated SNPs are called dsnp<i>. The original liabilities for this file are available in the file dataset1.phe.liab (but this file is not used by LEAP).
+The dataset was simulated with 50% heritability and  0.1% prevalence. It included 500 cases, 500 controls, 499 causal SNPs, 100 unusually differentiated SNPs and 10000 SNPs differentiated with FST=0.01. Causal SNPs are called csnp\<i\>, and unusually differentiated SNPs are called dsnp\<i\>. The original liabilities for this file are available in the file dataset1.phe.liab (but this file is not used by LEAP).
  
