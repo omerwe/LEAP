@@ -30,25 +30,25 @@ python <script_name> --help
  
 The LEAP pipeline includes the following stages:
 -------------------------------------------------
-1. (optional): Find related individuals to be removed:
+1) (optional): Find related individuals to be removed:
 ```
 python findRelated.py --bfilesim <Plink base file> --out <output file>
 ```
  This script creates a file marking the individuals that need to be removed to eliminate relatedness
  
-2. Compute heritability using the method of Golan and Rosset:
+2) Compute heritability using the method of Golan and Rosset:
 ```
 python calc_h2.py --bfilesim <Plink base file> --extractSim <SNPs used for heritability estimation> --prev <prevalence> --pheno <phenotype file> --related <relatedness file>
 ```
  This script outputs the heritability estimate
  
-3. Estimate liabilities:
+3) Estimate liabilities:
 ```
 python probit.py --bfilesim <Plink base file> --pheno <phenotype file> --prev <prevalence> --extractSim <SNPs used in the heritability estimation> --out <output base file> --related <relatedness file> --h2 <heritability>
 ```
  This script creates a file called <output base file>.liabs, with estimated liabilities for every individual. The estimated liabilities can be used directly for GWAS by using them as a standard phenotype file.
 
-4. Compute GWAS:
+4) Compute GWAS:
 ```
 python leap_gwas.py --bfilesim <Plink base file> --pheno <estimated liabilities file> --extractSim <SNPs used in the LMM kinship matrix> --out <output file> --h2 <heritability> --bfile <Plink file with tested SNPs> --extract <SNPs to test>
 ```
