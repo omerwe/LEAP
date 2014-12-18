@@ -82,7 +82,7 @@ python probit.py --help
 ```
 and
 ```
-leap_gwas.py
+python leap_gwas.py --help
 ```
 for instructions. However, we note that under extreme ascertainment, it is recommded to use covariates only in the liability estimation stage (see the paper for details).
  
