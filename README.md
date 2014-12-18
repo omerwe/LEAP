@@ -56,7 +56,7 @@ python findRelated.py --bfilesim <Plink base file> --out <output file>
 ```
 python calc_h2.py --bfilesim <Plink base file> --prev <prevalence> --pheno <phenotype file> [--extractSim <SNPs used for heritability estimation>  --related <relatedness file>]
 ```
- This script outputs the heritability estimate. The optional extractSim file is a text file with a list of SNP names (one SNP per line) that will be used for heritability estimation. It is recommended to perform a different heritability and liability estimation for every excluded chromosome, and then testing the SNPs on the excluded chromosome for association with the estimated liabilities. The optional relatedness file should be the output of stage 1, and is used to exclude related individuals from the analysis.
+ This script outputs the heritability estimate. The optional extractSim file is a text file with a list of SNP names (one SNP per line) that will be used for heritability estimation. It is recommended to perform a different heritability and liability estimation for every excluded chromosome, and then testing the SNPs on the excluded chromosome for association with the estimated liabilities. The optional relatedness file should be the output of stage 1, and is used to exclude related individuals from the analysis, which improves analysis results.
  
 3) Estimate liabilities:
 ```
@@ -69,7 +69,7 @@ This script creates a file called \<output base file\>.liabs, with estimated lia
 python leap_gwas.py --bfilesim <Plink base file for kinship estimation> --bfile <Plink file with tested SNPs> --pheno <estimated liabilities file> --out <output file> --h2 <heritability> [--extractSim <SNPs used in the LMM kinship matrix>  --extract <SNPs to test>]
 ```
 This script performs GWAS with a prespecified heritability level (as computed in stage 2). The pheno parameter is the liabilities file computed in stage 3. The syntax largely follows that of the [C++ version of FaST-LMM](http://research.microsoft.com/en-us/projects/fastlmm/).
-
+Kinship estimation should use the same SNPs used for heritability and liability estimation. The bfile and bfilesim parameters can both point to the same file. In this case, the extract and extractSim parameters should be used to guarantee that kinship estimation doesn't use SNPs on the excluded chromosome, and that all tested SNPs are on the excluded chromosome.
  
  
  
@@ -84,7 +84,7 @@ and
 ```
 leap_gwas.py
 ```
-for instructions.
+for instructions. However, we note that under extreme ascertainment, it is recommded to use covariates only in the liability estimation stage (see the paper for details).
  
 2. As described in the main text, it is recommended to perform a different liability estimation for every excluded chromosome, and then testing the SNPs on the excluded chromosome for association with the estimated liabilities. The -extractSim flag is useful for this. Please see the example file leap_pipeline.sh for a usage example.
  
