@@ -1,10 +1,12 @@
-###    LEAP
+LEAP
+----------------
 
 LEAP is a program for liability estimation in ascertained case-control studies, written in the Python language.
 It can estimate liabilities, that can then be treated as phenotypes in a GWAS context, which can greatly increase power.
 
 
-###    Installation
+Installation
+------------------
 The easiest way to install LEAP is via pip, by typing the command:
 ```shell
 pip install --user leap_gwas
@@ -29,7 +31,8 @@ Please make sure these are installed prior to using LEAP.
  
  
 
-###    Usage instructions
+Usage instructions
+----------------------
 LEAP is invoked though a series of Python scripts, as detailed below.
 The script leapUtils.sh runs the full LEAP pipeline on a small example dataset, and can be used for reference.
  
@@ -45,8 +48,7 @@ The command-line options for LEAP largely follow the options of the [C++ version
 FaST-LMM](http://research.microsoft.com/en-us/projects/fastlmm/).
  
  
-The LEAP pipeline includes the following stages:
--------------------------------------------------
+### The LEAP pipeline
 1) (optional): Find related individuals to be removed:
 ```
 python findRelated.py --bfilesim <Plink base file> --out <output file>
@@ -95,6 +97,7 @@ The dataset was simulated with 50% heritability and  0.1% prevalence. It include
  
 
 
-## Contact
+Contact
+---------
 For questions and comments, please contact Omer Weissbrod at omerw[at]cs.technion.ac.il
 
