@@ -65,7 +65,7 @@ python probit.py --bfilesim <Plink base file> --pheno <phenotype file> --prev <p
 ```
 python leap_gwas.py --bfilesim <Plink base file> --pheno <estimated liabilities file> --extractSim <SNPs used in the LMM kinship matrix> --out <output file> --h2 <heritability> --bfile <Plink file with tested SNPs> --extract <SNPs to test>
 ```
- This script performs GWAS with a prespecified h2. The syntax largely follows that of FaSTLMM C++ version.
+ This script performs GWAS with a prespecified heritability level (as computed in stage 2). The syntax largely follows that of FaSTLMM C++ version.
 
  
  
