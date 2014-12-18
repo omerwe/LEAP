@@ -32,7 +32,7 @@ Please make sure these are installed prior to using LEAP.
 LEAP is invoked though a series of Python scripts, as detailed below.
 The script leapUtils.sh runs the full LEAP pipeline on a small example dataset, and can be used for reference.
  
-Generally, LEAP uses the same file formats as FastLMM.
+Generally, LEAP uses the same file formats as [FaST-LMM](https://github.com/MicrosoftGenomics/FaST-LMM).
 Namely, input files are in [binary Plink format](http://pngu.mgh.harvard.edu/~purcell/plink/data.shtml#bed).
 When there is a contradiction between file formats used by Plink and by FastLMM, LEAP uses the convention adopted by FastLMM.
 Explanations about the parameters used by all the scripts can be seen by typing
