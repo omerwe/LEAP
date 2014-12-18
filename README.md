@@ -1,21 +1,28 @@
-##########################
-#    Overview:          #
-##########################
+###    LEAP
+
 LEAP is a program for liability estimation in ascertained case-control studies.
-It can estimate liabilities, that can then be treated as phenotypes in a GWAS context, which increases power.
+It can estimate liabilities, that can then be treated as phenotypes in a GWAS context, which can greatly increase power.
 
 
-##########################
-#    Dependencies:       #
-##########################
-LEAP requires Python 2.7, and is dependent on the FastLMM Python package.
+###    Installation
+* The easiest way to install LEAP is via pip, by typing the command:
+```shell
+pip install --user leap_gwas
+```
+Typically, the LEAP scripts will be installed at ~/.local/lib/python2.7/site-packages/LEAP/
+
+* LEAP is particular easy to install using the anaconda python distribution: https://store.continuum.io/cshop/anaconda. The numerical optimized version can speed LEAP up by several orders of magnitude.
+
+* If you want to install LEAP from source you require:
+* Python 2.7
+* The python pysnptools package (https://github.com/MicrosoftGenomics/PySnpTools).
+* Numpy and Scipy
+* Scikits-learn
 Please make sure these are installed prior to using LEAP.
-The easiest way to install LEAP is via pip, by typing the command:   pip install --user leap_gwas. This should also install all dependencies. Typically, the LEAP scripts will be installed at ~/.local/lib/python2.7/site-packages/LEAP/
  
  
-################################
-#    Usage instructions:       #
-################################
+
+###    Usage instructions
 LEAP is invoked though a series of Python scripts, as detailed below.
 The script leapUtils.sh runs the full LEAP pipeline on a small example dataset, and can be used for reference.
  
@@ -76,3 +83,8 @@ for instructions.
 This example estimates liabilities for a small balanced case-control dataset.
 The dataset was simulated with 50% heritability and  0.1% prevalence. It included 500 cases, 500 controls, 499 causal SNPs, 100 unusually differentiated SNPs and 10000 SNPs differentiated with FST=0.01. Causal SNPs are called csnp\<i\>, and unusually differentiated SNPs are called dsnp\<i\>. The original liabilities for this file are available in the file dataset1.phe.liab (but this file is not used by LEAP).
  
+
+
+## Contact
+For questiona and comments, please contact Omer Weissbrod at omerw[at]cs.technion.ac.il
+
