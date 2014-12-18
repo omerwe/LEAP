@@ -5,6 +5,7 @@ LEAP is a program for liability estimation in ascertained case-control studies, 
 It can estimate liabilities, that can then be treated as phenotypes in a GWAS context, which can greatly increase power.
 
 
+------------------
 Installation
 ------------------
 The easiest way to install LEAP is via pip, by typing the command:
