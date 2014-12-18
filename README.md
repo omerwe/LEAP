@@ -84,7 +84,7 @@ and
 ```
 python leap_gwas.py --help
 ```
-for instructions. However, we note that under extreme ascertainment, it is recommded to use covariates only in the liability estimation stage (see the paper for details).
+for instructions. However, we note that under extreme ascertainment, it is recommded to use covariates only in stages 2-3 (see the paper for details).
  
 2) As described in the main text, it is recommended to perform a different liability estimation for every excluded chromosome, and then testing the SNPs on the excluded chromosome for association with the estimated liabilities. The -extractSim flag is useful for this. Please see the example file leap_pipeline.sh for a usage example.
  
