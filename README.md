@@ -1,6 +1,6 @@
 ###    LEAP
 
-LEAP is a program for liability estimation in ascertained case-control studies.
+LEAP is a program for liability estimation in ascertained case-control studies, written in the Python language.
 It can estimate liabilities, that can then be treated as phenotypes in a GWAS context, which can greatly increase power.
 
 
@@ -9,7 +9,10 @@ It can estimate liabilities, that can then be treated as phenotypes in a GWAS co
 ```shell
 pip install --user leap_gwas
 ```
-Typically, the LEAP scripts will be installed at ~/.local/lib/python2.7/site-packages/LEAP/
+Typically, the LEAP scripts will be installed at:
+```
+~/.local/lib/python2.7/site-packages/LEAP/
+```shell
 
 * LEAP is particular easy to install using the anaconda python distribution: https://store.continuum.io/cshop/anaconda. The numerical optimized version can speed LEAP up by several orders of magnitude.
 
@@ -86,5 +89,5 @@ The dataset was simulated with 50% heritability and  0.1% prevalence. It include
 
 
 ## Contact
-For questiona and comments, please contact Omer Weissbrod at omerw[at]cs.technion.ac.il
+For questions and comments, please contact Omer Weissbrod at omerw[at]cs.technion.ac.il
 
