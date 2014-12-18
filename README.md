@@ -22,7 +22,7 @@ Typically, the LEAP scripts will be installed at:
 * Python 2.7
 * Numpy and Scipy
 * Scikits-learn
-* The pysnptools package (https://github.com/MicrosoftGenomics/PySnpTools).
+* The [pysnptools package](https://github.com/MicrosoftGenomics/PySnpTools).
 Please make sure these are installed prior to using LEAP.
  
  
