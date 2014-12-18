@@ -54,21 +54,21 @@ python findRelated.py --bfilesim <Plink base file> --out <output file>
  
 2) Compute heritability using the method of [Golan et al.](http://www.pnas.org/content/111/49/E5272.long):
 ```
-python calc_h2.py --bfilesim <Plink base file> --extractSim <SNPs used for heritability estimation> --prev <prevalence> --pheno <phenotype file> --related <relatedness file>
+python calc_h2.py --bfilesim <Plink base file> --prev <prevalence> --pheno <phenotype file> [--extractSim <SNPs used for heritability estimation>  --related <relatedness file>]
 ```
- This script outputs the heritability estimate
+ This script outputs the heritability estimate. The optional extractSim file is a text file with a list of SNP names (one SNP per line) that will be used for heritability estimation. It is recommended to perform a different heritability and liability estimation for every excluded chromosome, and then testing the SNPs on the excluded chromosome for association with the estimated liabilities. The optional relatedness file should be the output of stage 1, and is used to exclude related individuals from the analysis.
  
 3) Estimate liabilities:
 ```
-python probit.py --bfilesim <Plink base file> --pheno <phenotype file> --prev <prevalence> --extractSim <SNPs used in the heritability estimation> --out <output base file> --related <relatedness file> --h2 <heritability>
+python probit.py --bfilesim <Plink base file> --pheno <phenotype file> --prev <prevalence> --out <output base file> --h2 <heritability> [--extractSim <SNPs used in the liability estimation> --related <relatedness file>]
 ```
- This script creates a file called \<output base file\>.liabs, with estimated liabilities for every individual. The estimated liabilities can be used directly for GWAS by using them as a standard phenotype file.
+This script creates a file called \<output base file\>.liabs, with estimated liabilities for every individual. The estimated liabilities can be used directly for GWAS by using them as a standard phenotype file. The h2 parameter should be the heritability estimate from stage 2. The extractSim and relatedness file parameters should be the same as in stage 2.
 
 4) Test for Associations:
 ```
 python leap_gwas.py --bfilesim <Plink base file> --pheno <estimated liabilities file> --extractSim <SNPs used in the LMM kinship matrix> --out <output file> --h2 <heritability> --bfile <Plink file with tested SNPs> --extract <SNPs to test>
 ```
- This script performs GWAS with a prespecified heritability level (as computed in stage 2). The syntax largely follows that of the [C++ version of FaST-LMM](http://research.microsoft.com/en-us/projects/fastlmm/).
+This script performs GWAS with a prespecified heritability level (as computed in stage 2). The pheno parameter is the liabilities file computed in stage 3. The syntax largely follows that of the [C++ version of FaST-LMM](http://research.microsoft.com/en-us/projects/fastlmm/).
 
  
  
