@@ -22,7 +22,7 @@ Typically, the LEAP scripts will be installed at:
 * Python 2.7
 * Numpy and Scipy
 * Scikits-learn
-* The [pysnptools package](https://github.com/MicrosoftGenomics/PySnpTools).
+* The Python [FaST-LMM package](https://github.com/MicrosoftGenomics/FaST-LMM).
 
 Please make sure these are installed prior to using LEAP.
  
@@ -61,7 +61,7 @@ python probit.py --bfilesim <Plink base file> --pheno <phenotype file> --prev <p
 ```
  This script creates a file called \<output base file\>.liabs, with estimated liabilities for every individual. The estimated liabilities can be used directly for GWAS by using them as a standard phenotype file.
 
-4) Compute GWAS:
+4) Test for Associations:
 ```
 python leap_gwas.py --bfilesim <Plink base file> --pheno <estimated liabilities file> --extractSim <SNPs used in the LMM kinship matrix> --out <output file> --h2 <heritability> --bfile <Plink file with tested SNPs> --extract <SNPs to test>
 ```
