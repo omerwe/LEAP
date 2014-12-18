@@ -20,8 +20,8 @@ Typically, the LEAP scripts will be installed at:
 
 * If you want to install LEAP from source you need the following dependencies:
 * Python 2.7
-* Numpy and Scipy
-* Scikits-learn
+* [Numpy](http://www.numpy.org/) and [Scipy](http://www.scipy.org/)
+* [Scikits-learn](http://scikit-learn.org/stable/)
 * The Python [FaST-LMM package](https://github.com/MicrosoftGenomics/FaST-LMM).
 
 Please make sure these are installed prior to using LEAP.
