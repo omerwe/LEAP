@@ -31,7 +31,7 @@ If you want to install LEAP manually you need the following dependencies:
 Please make sure these are installed prior to using LEAP.
  
  
-
+------------------
 Usage instructions
 ----------------------
 LEAP is invoked though a series of Python scripts, as detailed below.
@@ -76,7 +76,7 @@ This script performs GWAS with a prespecified heritability level (as computed in
 Kinship estimation should use the same SNPs used for heritability and liability estimation. The bfile and bfilesim parameters can both point to the same file. In this case, the extract and extractSim parameters should be used to guarantee that kinship estimation doesn't use SNPs on the excluded chromosome, and that all tested SNPs are on the excluded chromosome.
  
  
- 
+-----------------
 General comments and tips
 -------------------------
 1) Fixed effects can be included in stages 2-4 by adding the flag --covar.
@@ -97,7 +97,7 @@ This example estimates liabilities for a small balanced case-control dataset.
 The dataset was simulated with 50% heritability and  0.1% prevalence. It included 500 cases, 500 controls, 499 causal SNPs, 100 unusually differentiated SNPs and 10000 SNPs differentiated with FST=0.01. Causal SNPs are called csnp\<i\>, and unusually differentiated SNPs are called dsnp\<i\>. The original liabilities for this file are available in the file dataset1.phe.liab (but this file is not used by LEAP).
  
 
-
+-----------------
 Contact
 ---------
 For questions and comments, please contact Omer Weissbrod at omerw[at]cs.technion.ac.il
