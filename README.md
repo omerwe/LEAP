@@ -9,10 +9,11 @@ It can estimate liabilities, that can then be treated as phenotypes in a GWAS co
 ```shell
 pip install --user leap_gwas
 ```
+
 Typically, the LEAP scripts will be installed at:
 ```
 ~/.local/lib/python2.7/site-packages/LEAP/
-```shell
+```
 
 * LEAP is particular easy to install using the anaconda python distribution: https://store.continuum.io/cshop/anaconda. The numerical optimized version can speed LEAP up by several orders of magnitude.
 
