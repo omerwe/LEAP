@@ -41,7 +41,7 @@ python <script_name> --help
 ```
 
 The command-line options for LEAP largely follow the options of the [C++ version of 
-FaST-LMM](http://research.microsoft.com/en-us/projects/fastlmm/)
+FaST-LMM](http://research.microsoft.com/en-us/projects/fastlmm/).
  
  
 The LEAP pipeline includes the following stages:
@@ -50,7 +50,7 @@ The LEAP pipeline includes the following stages:
 ```
 python findRelated.py --bfilesim <Plink base file> --out <output file>
 ```
- This script creates a file marking the individuals that need to be removed to eliminate relatedness
+ This script creates a file marking the individuals that need to be removed to eliminate relatedness.
  
 2) Compute heritability using the method of [Golan et al.](http://www.pnas.org/content/111/49/E5272.long):
 ```
@@ -66,7 +66,7 @@ This script creates a file called \<output base file\>.liabs, with estimated lia
 
 4) Test for Associations:
 ```
-python leap_gwas.py --bfilesim <Plink base file> --pheno <estimated liabilities file> --extractSim <SNPs used in the LMM kinship matrix> --out <output file> --h2 <heritability> --bfile <Plink file with tested SNPs> --extract <SNPs to test>
+python leap_gwas.py --bfilesim <Plink base file for kinship estimation> --bfile <Plink file with tested SNPs> --pheno <estimated liabilities file> --out <output file> --h2 <heritability> [--extractSim <SNPs used in the LMM kinship matrix>  --extract <SNPs to test>]
 ```
 This script performs GWAS with a prespecified heritability level (as computed in stage 2). The pheno parameter is the liabilities file computed in stage 3. The syntax largely follows that of the [C++ version of FaST-LMM](http://research.microsoft.com/en-us/projects/fastlmm/).
 
