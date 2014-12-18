@@ -49,7 +49,7 @@ python findRelated.py --bfilesim <Plink base file> --out <output file>
 ```
  This script creates a file marking the individuals that need to be removed to eliminate relatedness
  
-2) Compute heritability using the method of Golan and Rosset:
+2) Compute heritability using the method of [Golan et al.](http://www.pnas.org/content/111/49/E5272.long):
 ```
 python calc_h2.py --bfilesim <Plink base file> --extractSim <SNPs used for heritability estimation> --prev <prevalence> --pheno <phenotype file> --related <relatedness file>
 ```
