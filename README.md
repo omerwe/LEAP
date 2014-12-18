@@ -39,6 +39,9 @@ Explanations about the parameters used by all the scripts can be seen by typing
 ```
 python <script_name> --help
 ```
+
+The command-line options for LEAP largely follow the options of the [C++ version of 
+FaST-LMM](http://research.microsoft.com/en-us/projects/fastlmm/)
  
  
 The LEAP pipeline includes the following stages:
