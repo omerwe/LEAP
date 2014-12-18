@@ -75,7 +75,7 @@ Kinship estimation should use the same SNPs used for heritability and liability 
  
 General comments and tips
 -------------------------
-1) Fixed effects can be included in the stages 2-4.
+1) Fixed effects can be included in stages 2-4 by adding the flag --covar.
 Please type
 ```
 python probit.py --help
