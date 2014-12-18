@@ -18,11 +18,11 @@ Typically, the LEAP scripts will be installed at:
 * LEAP is particularly easy to install using the [Anaconda Python distribution](https://store.continuum.io/cshop/anaconda). The [numerically optimized version](http://continuum.io/blog/mkl-optimizations) of Anaconda can speed LEAP up by several orders of magnitude.
 * Alternatively (if Anaconda can't be installed), for very fast performance it is recommended to have an optimized version of Numpy/Scipy [installed on your system](http://www.scipy.org/scipylib/building), using optimized numerical libraries such as [OpenBLAS](http://www.openblas.net) or [Intel MKL](https://software.intel.com/en-us/intel-mkl) (see [Compilation instructions for scipy with Intel MKL)](https://software.intel.com/en-us/articles/numpyscipy-with-intel-mkl). 
 
-* If you want to install LEAP from source you require:
+* If you want to install LEAP from source you need the following dependencies:
 * Python 2.7
-* The python pysnptools package (https://github.com/MicrosoftGenomics/PySnpTools).
 * Numpy and Scipy
 * Scikits-learn
+* The pysnptools package (https://github.com/MicrosoftGenomics/PySnpTools).
 Please make sure these are installed prior to using LEAP.
  
  
