@@ -16,7 +16,7 @@ Typically, the LEAP scripts will be installed at:
 ```
 
 * LEAP is particularly easy to install using the [Anaconda Python distribution](https://store.continuum.io/cshop/anaconda). The [numerically optimized version](http://continuum.io/blog/mkl-optimizations) of Anaconda can speed LEAP up by several orders of magnitude.
-* Alternatively, for very fast performance, it is recommended to have an optimized version of Numpy/Scipy [installed on your system](http://www.scipy.org/scipylib/building), using optimized numerical libraries such as [OpenBLAS](http://www.openblas.net) or [Intel MKL](https://software.intel.com/en-us/articles/numpyscipy-with-intel-mkl). 
+* Alternatively (if Anaconda can't be installed), for very fast performance, it is recommended to have an optimized version of Numpy/Scipy [installed on your system](http://www.scipy.org/scipylib/building), using optimized numerical libraries such as [OpenBLAS](http://www.openblas.net) or [Intel MKL](https://software.intel.com/en-us/articles/numpyscipy-with-intel-mkl). 
 
 * If you want to install LEAP from source you require:
 * Python 2.7
