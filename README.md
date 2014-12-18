@@ -75,7 +75,7 @@ Kinship estimation should use the same SNPs used for heritability and liability 
  
 General comments and tips
 -------------------------
-1) Fixed effects can be included in the liability estimation and GWAS stages.
+1) Fixed effects can be included in the stages 2-4.
 Please type
 ```
 python probit.py --help
