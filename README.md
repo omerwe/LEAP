@@ -5,7 +5,7 @@ It can estimate liabilities, that can then be treated as phenotypes in a GWAS co
 
 
 ###    Installation
-* The easiest way to install LEAP is via pip, by typing the command:
+The easiest way to install LEAP is via pip, by typing the command:
 ```shell
 pip install --user leap_gwas
 ```
