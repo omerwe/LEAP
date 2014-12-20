@@ -92,7 +92,7 @@ for instructions. However, we note that under extreme ascertainment, it is recom
  
 2) As described in the main text, it is recommended to perform a different liability estimation for every excluded chromosome, and then testing the SNPs on the excluded chromosome for association with the estimated liabilities. The -extractSim flag is useful for this. Please see the example file leap_pipeline.sh for a usage example.
  
-3_ A complete end-to-end usage example is provided with the LEAP source files, and can be invoked via the script leap_pipeline.sh.
+3) A complete end-to-end usage example is provided with the LEAP source files, and can be invoked via the script leap_pipeline.sh.
 This example estimates liabilities for a small balanced case-control dataset.
 The dataset was simulated with 50% heritability and  0.1% prevalence. It included 500 cases, 500 controls, 499 causal SNPs, 100 unusually differentiated SNPs and 10000 SNPs differentiated with FST=0.01. Causal SNPs are called csnp\<i\>, and unusually differentiated SNPs are called dsnp\<i\>. The original liabilities for this file are available in the file dataset1.phe.liab (but this file is not used by LEAP).
  
