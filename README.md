@@ -58,10 +58,10 @@ python findRelated.py --bfilesim <Plink base file> --out <output file>
  
 **2) Compute heritability using the method of [Golan et al.](http://www.pnas.org/content/111/49/E5272.long):**
 ```
-python calc_h2.py --bfilesim <Plink base file> --prev <prevalence> --pheno <phenotype file> [--extractSim <SNPs used for heritability estimation>  --related <relatedness file>]
+python calc_h2.py --bfilesim <Plink base file> --prev <prevalence> --pheno <phenotype file> --h2coeff 1.0 [--extractSim <SNPs used for heritability estimation>  --related <relatedness file> --h2coeff <heritability coefficient>]
 ```
  This script outputs the heritability estimate. The optional extractSim file is a text file with a list of SNP names (one SNP per line) that will be used for heritability estimation. It is recommended to perform a different heritability and liability estimation for every excluded chromosome, and then testing the SNPs on the excluded chromosome for association with the estimated liabilities. The optional relatedness file should be the output of stage 1, and is used to exclude related individuals from the analysis, which improves analysis results.
- 
+
 **3) Estimate liabilities:**
 ```
 python probit.py --bfilesim <Plink base file> --pheno <phenotype file> --prev <prevalence> --out <output base file> --h2 <heritability> [--extractSim <SNPs used in the liability estimation> --related <relatedness file>]
