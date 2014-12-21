@@ -88,7 +88,7 @@ Kinship estimation should use the same SNPs used for heritability and liability 
 -----------------
 General comments and tips
 -------------------------
-**1)** A single eigendecomposition can be used throughout all stages of the pipeline, as explained above and demonstrated i the example script. This can help prevent redundant computations and substantially speeds up the analysis.
+**1)** A single eigendecomposition can be used throughout all stages of the pipeline, as explained above and demonstrated in the example script. This can help prevent redundant computations and substantially speeds up the analysis.
 
 **2)** Fixed effects can be included in stages 2-4 by adding the flag --covar.
 Please type
