@@ -37,7 +37,7 @@ else:
 #python setup.py sdist bdist_wininst upload
 setup(
     name='leap_gwas',
-    version='0.1.4',
+    version='0.1.4.1',
     description='Liability Estimation in Case Control Studies',
     long_description=readme(),
     keywords='gwas bioinformatics LMMs MLMs',
@@ -45,9 +45,9 @@ setup(
     author='Omer Weissbrod',
     author_email='omerw@cs.technion.ac.il',
     license='Apache 2.0',    
-	packages=["leap", "leap/leap", "leap/dataset1", "leap/results_gold"],
+    packages=["leap", "leap/leap", "leap/dataset1", "leap/results_gold"],
     include_package_data=True,
-    requires = ['numpy', 'scipy', 'fastlmm', 'sklearn'],
+    install_requires = ['numpy', 'scipy', 'fastlmm', 'sklearn'],
     #zip_safe=False,
     # extensions        
 	include_dirs = [numpy.get_include()]
