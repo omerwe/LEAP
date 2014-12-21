@@ -56,30 +56,41 @@ python findRelated.py --bfilesim <Plink base file> --out <output file>
 ```
  This script creates a file marking the individuals that need to be removed to eliminate relatedness.
  
-**2) Compute heritability using the method of [Golan et al.](http://www.pnas.org/content/111/49/E5272.long):**
+ **2) Compute an eigendecomposition for the genetic similarity matrix:**
 ```
-python calc_h2.py --bfilesim <Plink base file> --prev <prevalence> --pheno <phenotype file> --h2coeff 1.0 [--extractSim <SNPs used for heritability estimation>  --related <relatedness file> --h2coeff <heritability coefficient>]
+python eigenDecompose.py --bfilesim <binary plink file> --out <output file> [--extractSim <SNPs file> --pheno <phenotype file>]
 ```
- This script outputs the heritability estimate. The optional extractSim file is a text file with a list of SNP names (one SNP per line) that will be used for heritability estimation. It is recommended to perform a different heritability and liability estimation for every excluded chromosome, and then testing the SNPs on the excluded chromosome for association with the estimated liabilities. The optional relatedness file should be the output of stage 1, and is used to exclude related individuals from the analysis, which improves analysis results.
+This computes the genetic similarity matrix (or kinship matrix) and its eigendecomposition, which can be used by all downstream stages. The optional extractSim file is a text file with a list of SNP names (one SNP per line) that will be used for heritability estimation. It is recommended to perform a different heritability and liability estimation for every excluded chromosome, and then testing the SNPs on the excluded chromosome for association with the estimated liabilities. Consequently, this script should be run once for each left-out chromosome.
+The optional phenotype file parameter is only useful for excluding individuals with an unknown phenotype.
 
-**3) Estimate liabilities:**
+ 
+**3) Compute heritability using the method of [Golan et al.](http://www.pnas.org/content/111/49/E5272.long):**
 ```
-python probit.py --bfilesim <Plink base file> --pheno <phenotype file> --prev <prevalence> --out <output base file> --h2 <heritability> [--extractSim <SNPs used in the liability estimation> --related <relatedness file>]
+python calc_h2.py --bfilesim <Plink base file> --prev <prevalence> --pheno <phenotype file> --h2coeff 1.0 [ --eigen <eigen file> --extractSim <SNPs used for heritability estimation>  --related <relatedness file> --h2coeff <heritability coefficient>]
 ```
-This script creates a file called \<output base file\>.liabs, with estimated liabilities for every individual. The estimated liabilities can be used directly for GWAS by using them as a standard phenotype file. The h2 parameter should be the heritability estimate from stage 2. The extractSim and relatedness file parameters should be the same as in stage 2.
+This script outputs the heritability estimate. The optional eigen file parameter is the output of stage 2, and is used to prevent redundant computations. If the eigen option is used, the extractSim option must also be used, with the same value that was used in stage 2. The extractSim file can also be used without the eigen parameter (in this case, this script will also compute the eigendecomposition on its own).
+The optional relatedness file should be the output of stage 1, and is used to exclude related individuals from the analysis, which improves analysis results.
 
-**4) Test for Associations:**
+**4) Estimate liabilities:**
 ```
-python leap_gwas.py --bfilesim <Plink base file for kinship estimation> --bfile <Plink file with tested SNPs> --pheno <estimated liabilities file> --out <output file> --h2 <heritability> [--extractSim <SNPs used in the LMM kinship matrix>  --extract <SNPs to test>]
+python probit.py --bfilesim <Plink base file> --pheno <phenotype file> --prev <prevalence> --out <output base file> --h2 <heritability> [--eigen <eigen file> --extractSim <SNPs used in the liability estimation> --related <relatedness file>]
 ```
-This script performs GWAS with a prespecified heritability level (as computed in stage 2). The pheno parameter is the liabilities file computed in stage 3. The syntax largely follows that of the [C++ version of FaST-LMM](http://research.microsoft.com/en-us/projects/fastlmm/).
+This script creates a file called \<output base file\>.liabs, with estimated liabilities for every individual. The estimated liabilities can be used directly for GWAS by using them as a standard phenotype file. The h2 parameter should be the heritability estimate from stage 3. The eigen, extractSim and relatedness file parameters should be the same as in stage 2.
+
+**5) Test for Associations:**
+```
+python leap_gwas.py --bfilesim <Plink base file for kinship estimation> --bfile <Plink file with tested SNPs> --pheno <estimated liabilities file> --out <output file> --h2 <heritability> [-eigen <eigen file> --extractSim <SNPs used in the LMM kinship matrix>  --extract <SNPs to test>]
+```
+This script performs GWAS with a prespecified heritability level (as computed in stage 3). The pheno parameter is the liabilities file computed in stage 3. The syntax largely follows that of the [C++ version of FaST-LMM](http://research.microsoft.com/en-us/projects/fastlmm/).
 Kinship estimation should use the same SNPs used for heritability and liability estimation. The bfile and bfilesim parameters can both point to the same file. In this case, the extract and extractSim parameters should be used to guarantee that kinship estimation doesn't use SNPs on the excluded chromosome, and that all tested SNPs are on the excluded chromosome.
  
  
 -----------------
 General comments and tips
 -------------------------
-**1)** Fixed effects can be included in stages 2-4 by adding the flag --covar.
+**1)** A single eigendecomposition can be used throughout all stages of the pipeline, as explained above and demonstrated i the example script. This can help prevent redundant computations and substantially speeds up the analysis.
+
+**2)** Fixed effects can be included in stages 2-4 by adding the flag --covar.
 Please type
 ```
 python probit.py --help
@@ -90,12 +101,13 @@ python leap_gwas.py --help
 ```
 for instructions. However, we note that under extreme ascertainment, it is recommded to use covariates only in stages 2-3 (see the paper for details).
  
-**2)** As described in the main text, it is recommended to perform a different liability estimation for every excluded chromosome, and then testing the SNPs on the excluded chromosome for association with the estimated liabilities. The -extractSim flag is useful for this. Please see the example file leap_pipeline.sh for a usage example.
+**3)** As described in the main text, it is recommended to perform a different liability estimation for every excluded chromosome, and then testing the SNPs on the excluded chromosome for association with the estimated liabilities. The -extractSim flag is useful for this. Please see the example file leap_pipeline.sh for a usage example.
  
-**3)** A complete end-to-end usage example is provided with the LEAP source files, and can be invoked via the script leap_pipeline.sh.
+**4)** A complete end-to-end usage example is provided with the LEAP source files, and can be invoked via the script leap_pipeline.sh.
 This example estimates liabilities for a small balanced case-control dataset.
 The dataset was simulated with 50% heritability and  0.1% prevalence. It included 500 cases, 500 controls, 499 causal SNPs, 100 unusually differentiated SNPs and 10000 SNPs differentiated with FST=0.01. Causal SNPs are called csnp\<i\>, and unusually differentiated SNPs are called dsnp\<i\>. The original liabilities for this file are available in the file dataset1.phe.liab (but this file is not used by LEAP).
  
+**5)** A unit-tests script called "test.py" is included in the source directory. This script runs an example analysis and verifies that it completed successfully. If not, it will produce an appropriate error message. This is useful to verify that all dependencies are installed correctly.
 
 -----------------
 Contact
