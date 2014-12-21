@@ -1,4 +1,4 @@
-P
+LEAP
 ----------------
 
 LEAP is a program for liability estimation in ascertained case-control studies, written in the Python language.
