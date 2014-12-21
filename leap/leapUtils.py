@@ -4,15 +4,15 @@ import scipy.linalg as la
 import scipy.linalg.blas as blas
 import csv
 import time
-import VertexCut as vc
-from pysnptools.pysnptools.snpreader.bed import Bed
-from fastlmm.pyplink import plink
-import pysnptools.pysnptools.util.util as pyutil
+import fastlmm.util.VertexCut as vc
+from pysnptools.snpreader.bed import Bed
+import pysnptools.util as pstutil
+import pysnptools.util.pheno as phenoUtils
 np.set_printoptions(precision=3, linewidth=200)
 
 
 
-def loadData(bfile, extractSim, phenoFile, missingPhenotype=-9, loadSNPs=False, standardize=True):
+def loadData(bfile, extractSim, phenoFile, missingPhenotype='-9', loadSNPs=False, standardize=True):
 	bed = Bed(bfile)
 	
 	if (extractSim is not None):
@@ -34,17 +34,11 @@ def loadData(bfile, extractSim, phenoFile, missingPhenotype=-9, loadSNPs=False, 
 	return bed, phe
 	
 	
-def loadPheno(bed, phenoFile, missingPhenotype = None):
-	phenoDict = plink.loadOnePhen(phenoFile)
-	if (missingPhenotype is not None):
-		indsToKeep = (phenoDict['vals'][:,0] != missingPhenotype)
-		if (not np.all(indsToKeep)):		
-			phenoDict['vals'] = phenoDict['vals'][indsToKeep, :]
-			phenoDict['iid'] = phenoDict['iid'][indsToKeep, :]
-			
+def loadPheno(bed, phenoFile, missingPhenotype='-9'):
+	phenoDict = phenoUtils.loadOnePhen(phenoFile, missing=missingPhenotype, vectorize=True)
 	checkIntersction(bed, phenoDict, 'phenotypes')
-	bed, phenoDict = pyutil.intersect_apply([bed, phenoDict])
-	phe = phenoDict['vals'][:,0]
+	bed, phenoDict = pstutil.intersect_apply([bed, phenoDict])
+	phe = phenoDict['vals']
 	return bed, phe
 	
 	
@@ -66,10 +60,10 @@ def symmetrize(a):
 	
 
 def loadRelatedFile(bed, relFile):
-	relatedDict = plink.loadOnePhen(relFile)
+	relatedDict = phenoUtils.loadOnePhen(relFile, vectorize=True)
 	checkIntersction(bed, relatedDict, 'relatedness', checkSuperSet=True)
-	_, relatedDict = pyutil.intersect_apply([bed, relatedDict])
-	related = relatedDict['vals'][:,0]
+	_, relatedDict = pstutil.intersect_apply([bed, relatedDict])
+	related = relatedDict['vals']
 	keepArr = (related < 0.5)
 	print np.sum(~keepArr), 'individuals will be removed due to high relatedness'
 	return keepArr
@@ -98,7 +92,8 @@ def eigenDecompose(XXT):
 	s,U = la.eigh(XXT)
 	if (np.min(s) < -1e-4): raise Exception('Negative eigenvalues found')
 	s[s<0]=0	
-	ind = np.argsort(s)[::-1]
+	ind = np.argsort(s)
+	ind = ind[s>1e-12]
 	U = U[:, ind]
 	s = s[ind]
 	print 'Done in %0.2f'%(time.time()-t0), 'seconds'
@@ -107,9 +102,9 @@ def eigenDecompose(XXT):
 	
 
 def loadCovars(bed, covarFile):
-	covarsDict = plink.loadOnePhen(covarFile)
+	covarsDict = phenoUtils.loadOnePhen(covarFile, vectorize=False)
 	checkIntersction(bed, covarsDict, 'covariates', checkSuperSet=True)
-	_, covarsDict = pyutil.intersect_apply([bed, covarsDict])
+	_, covarsDict = pstutil.intersect_apply([bed, covarsDict])
 	covar = covarsDict['vals']
 	covar -= np.mean(covar, axis=0)
 	covar /= np.std(covar, axis=0)	
