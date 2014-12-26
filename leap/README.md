@@ -1,4 +1,4 @@
-P
+LEAP
 ----------------
 
 LEAP is a program for liability estimation in ascertained case-control studies, written in the Python language.
@@ -22,7 +22,7 @@ LEAP is particularly easy to install using the [Anaconda Python distribution](ht
 
 Alternatively (if Anaconda can't be installed), for very fast performance it is recommended to have an optimized version of Numpy/Scipy [installed on your system](http://www.scipy.org/scipylib/building), using optimized numerical libraries such as [OpenBLAS](http://www.openblas.net) or [Intel MKL](https://software.intel.com/en-us/intel-mkl) (see [Compilation instructions for scipy with Intel MKL)](https://software.intel.com/en-us/articles/numpyscipy-with-intel-mkl). 
 
-If you want to install LEAP manually you need the following dependencies:
+To install LEAP manually, you need the following dependencies:
 * Python 2.7
 * [Numpy](http://www.numpy.org/) and [Scipy](http://www.scipy.org/)
 * [Scikits-learn](http://scikit-learn.org/stable/)
@@ -34,8 +34,10 @@ Please make sure these are installed prior to using LEAP.
 ------------------
 Usage instructions
 ----------------------
-LEAP is invoked though a series of Python scripts, as detailed below.
-The script leapUtils.sh runs the full LEAP pipeline on a small example dataset, and can be used for reference.
+There are two ways to run LEAP.
+The first if via a Python API. A detailed explanation about this option is provided in the [LEAP Ipython notebook](http://nbviewer.ipython.org/github/omerwe/LEAP/blob/master/leap/regression/Leap_example.ipynb).
+
+The second option is to run LEAP is invoked though a series of Python scripts, as detailed below. This option is more suitable for those not familiar with Python. The script leapUtils.sh runs the full LEAP pipeline on a small example dataset, and can be used for reference.
  
 Generally, LEAP uses the same file formats as [FaST-LMM](https://github.com/MicrosoftGenomics/FaST-LMM).
 Namely, input files are in [binary Plink format](http://pngu.mgh.harvard.edu/~purcell/plink/data.shtml#bed).
