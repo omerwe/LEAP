@@ -29,6 +29,7 @@ To install LEAP manually, you need the following dependencies:
 * The Python [FaST-LMM package](https://github.com/MicrosoftGenomics/FaST-LMM).
 
 Please make sure these are installed prior to using LEAP.
+To verify that everything is correctly installed, please run the script test.py in the regression directory. It will run a small example analysis and print an error message if any problem is found.
  
  
 ------------------
