@@ -1,7 +1,7 @@
 LEAP
 ----------------
 
-LEAP is a program for liability estimation in ascertained case-control studies, written in the Python language.
+LEAP is a program for liability estimation in ascertained case-control genome-wide studies, written in the Python language.
 LEAP estimates liabilities, that can then be treated as phenotypes in a GWAS context, which can greatly increase power.
 
 
