@@ -61,9 +61,9 @@ python findRelated.py --bfilesim <Plink base file> --out <output file>
  
  **2) Compute an eigendecomposition of the kinship matrix:**
 ```
-python eigenDecompose.py --bfilesim <Plink base file> --out <output file> [--extractSim <SNPs user to estimate kinship> --pheno <phenotype file>]
+python eigenDecompose.py --bfilesim <Plink base file> --out <output file> [--extractSim <SNPs used to estimate kinship> --pheno <phenotype file>]
 ```
-This script computes a kinship matrix and its eigendecomposition, and saves it to speed up subsequent stages. It is recommended to perform a leave-one-chromosome-out (LOCO) analysis by computing a different kinship matrix for each chromosome, each one consisting of all SNPs except those on the selected chromosome. The optional extractSim file is a text file with a list of SNP names (one SNP per line) to facilitate this. The optional phenotype file is only used to exclude individuals with an unknown phenotype.
+This script computes a kinship matrix and its eigendecomposition, and saves them to speed up subsequent stages. It is recommended to perform a leave-one-chromosome-out (LOCO) analysis by computing a different kinship matrix for each chromosome, each one consisting of all SNPs except those on the selected chromosome. The optional extractSim file is a text file with a list of SNP names (one SNP per line) to facilitate this. The optional phenotype file is only used to exclude individuals with an unknown phenotype.
  
 **3) Compute heritability using the method of [Golan et al.](http://www.pnas.org/content/111/49/E5272.long):**
 ```
