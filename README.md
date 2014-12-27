@@ -38,7 +38,7 @@ Usage instructions
 There are two ways to run LEAP.
 The first is via a Python API. A detailed explanation about this option is provided in the [LEAP Ipython notebook](http://nbviewer.ipython.org/github/omerwe/LEAP/blob/master/leap/regression/Leap_example.ipynb).
 
-The second option is to run LEAP is invoked though a series of Python scripts, as detailed below. This option is more suitable for those not familiar with Python. The script leapUtils.sh runs the full LEAP pipeline on a small example dataset, and can be used for reference.
+The second option is to run LEAP though a series of Python scripts, as detailed below. This option is more suitable for those not familiar with Python. The script leapUtils.sh runs the full LEAP pipeline on a small example dataset, and can be used for reference.
  
 Generally, LEAP uses the same file formats as [FaST-LMM](https://github.com/MicrosoftGenomics/FaST-LMM).
 Namely, input files are in [binary Plink format](http://pngu.mgh.harvard.edu/~purcell/plink/data.shtml#bed).
