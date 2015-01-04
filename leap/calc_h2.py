@@ -9,6 +9,7 @@ np.set_printoptions(precision=3, linewidth=200)
 import leapUtils
 import leapMain
 
+
 def calcLiabThreholds(U, S, keepArr, phe, numRemovePCs, prev):
 
 	#Run logistic regression
@@ -203,7 +204,7 @@ if __name__ == '__main__':
 	if (args.eigen is not None): eigen = np.load(args.eigen)
 	else:
 		import eigenDecompose
-		eigen = eigenDecompose.eigenDecompose(bed)	
+		eigen = eigenDecompose.eigenDecompose(bed.val)	
 
 	#Compute relatedness
 	if (args.relCutoff <= 0): keepArr = np.ones(bed.iid.shape[0], dtype=bool)
