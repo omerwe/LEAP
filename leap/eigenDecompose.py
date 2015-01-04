@@ -7,7 +7,7 @@ import scipy.linalg.blas as blas
 import leapMain
 np.set_printoptions(precision=3, linewidth=200)
 
-def eigenDecompose(bed, outFile):
+def eigenDecompose(bed, outFile=None):
 
 	bed = leapUtils._fixupBed(bed)
 

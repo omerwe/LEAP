@@ -204,7 +204,7 @@ if __name__ == '__main__':
 	if (args.eigen is not None): eigen = np.load(args.eigen)
 	else:
 		import eigenDecompose
-		eigen = eigenDecompose.eigenDecompose(bed.val)	
+		eigen = eigenDecompose.eigenDecompose(bed)	
 
 	#Compute relatedness
 	if (args.relCutoff <= 0): keepArr = np.ones(bed.iid.shape[0], dtype=bool)
