@@ -1,9 +1,7 @@
 import numpy as np
 from optparse import OptionParser
 import scipy.linalg as la
-import scipy.stats as stats
 import scipy.linalg.blas as blas
-import pandas as pd
 import csv
 import time
 import fastlmm.util.VertexCut as vc
@@ -188,51 +186,3 @@ def _fixup_pheno(pheno, bed=None, missingPhenotype='-9'):
 		if (bed is not None): return bed, pheno			
 		else: return pheno
 
-def linreg(bed, pheno):
-
-	#Extract snps and phenotype
-	bed, pheno = _fixupBedAndPheno(bed, pheno)	
-	if isinstance(pheno, dict):	phe = pheno['vals']	
-	else: phe = pheno		
-	if (len(phe.shape)==2):
-		if (phe.shape[1]==1): phe=phe[:,0]
-		else: raise Exception('More than one phenotype found')	
-
-	#Normalize y. We assume X is already normalized.
-	y = phe - phe.mean(); y /= y.std()
-
-	#Compute p-values
-	Xy = bed.val.T.dot(y) / y.shape[0]
-	Xy[Xy>1.0] = 1.0
-	Xy[Xy<-1.0] = -1.0
-	df = y.shape[0]-2
-	TINY = 1.0e-20
-	t = Xy * np.sqrt(df / ((1.0-Xy+TINY) * (1.0+Xy+TINY)))
-	pValT = stats.t.sf(np.abs(t), df)*2	
-	
-	#Create pandas data frame
-	items = [
-		('SNP', bed.sid),
-		('Chr', bed.pos[:,0]), 
-		('GenDist', bed.pos[:,1]),
-		('ChrPos', bed.pos[:,2]), 
-		('PValue', pValT),                
-	]
-	frame = pd.DataFrame.from_items(items)	
-	frame.sort("PValue", inplace=True)
-	frame.index = np.arange(len(frame))	
-	return frame
-	
-def powerPlot(df, causalSNPs, title=''):
-	import pylab
-	causalSNPs = set(causalSNPs)
-	csnpPvals = df[df['SNP'].isin(causalSNPs)]["PValue"]	
-	pvalPoints = np.logspace(-6, -2, num=1000)
-	power = [np.mean(csnpPvals < p ) for p in list(pvalPoints)]
-	pylab.plot(-np.log10(pvalPoints), power)
-	pylab.xlabel("-log10(Significance Threshold)")
-	pylab.ylabel("Power")
-	pylab.title(title)
-	
-	
-	

@@ -4,47 +4,12 @@ import scipy.linalg as la
 import time
 import sklearn.linear_model
 import sys
-from optparse import OptionParser
+import argparse
 import scipy.optimize as opt
 import scipy.linalg.blas as blas
 import leapUtils
+import leapMain
 np.set_printoptions(precision=6, linewidth=200)
-
-
-
-
-
-parser = OptionParser()
-parser.add_option('--bfilesim', metavar='bfilesim', default=None, help='Binary plink file')
-parser.add_option('--pheno', metavar='pheno', default=None, help='Phenotype file in Plink format')
-parser.add_option('--h2', metavar='h2', type=float, default=None, help='Liability heritability')
-parser.add_option('--eigen', metavar='eigen', default=None, help='eigen file')
-parser.add_option('--prev', metavar='prev', type=float, default=None, help='Trait prevalence')
-parser.add_option('--extractSim', metavar='extractSim', default=None, help='SNPs subset to use')
-parser.add_option('--out', metavar='out', default=None, help='output file')
-
-parser.add_option('--covar', metavar='covar', default=None, help='covariates file in FastLMM format')
-parser.add_option('--thresholds', metavar='thresholds', default=None, help="liability thresholds file")
-parser.add_option('--nofail', metavar='nofail', type=int, default=0, help="Do not raise exception if Probit fitting failed")
-
-parser.add_option('--relCutoff', metavar='relCutoff', type=float, default=0.05, help='Relatedness cutoff')
-parser.add_option('--numSkipTopPCs', metavar='numSkipTopPCs', type=int, default=0, help='Number of PCs to skip')
-parser.add_option('--numFixedPCs', metavar='numFixedPCs', type=int, default=0, help='Number of PCs to use as fixed effects')
-parser.add_option('--hess', metavar='hess', type=int, default=1, help='Whether to compute Hessian analytically (1) or not (0)')
-parser.add_option('--bfile', metavar='bfile', default=None, help='Binary plink file with SNPs that can be used as fixed effects')
-parser.add_option('--resfile', metavar='resfile', default=None, help='A linear regression results file in FastLMM format, used to choose SNPs that will be used as fixed effects')
-parser.add_option('--pthresh', metavar='pthresh', type=float, default=5e-8, help='p-value cutoff below which SNPs will be used as fixed effects')
-parser.add_option('--mineig', metavar='mineig', type=float, default=1e-3, help='eigenvectors with singular value below this value will not be used')
-parser.add_option('--extract', metavar='extract', default=None, help='subset of SNPs to be considered as fixed effects')
-parser.add_option('--related', metavar='related', default=None, help='File with info about related individuals to remove')
-parser.add_option('--mindist', metavar='mindist', type=int, default=0, help='Minimum distance between fixed effects SNPs')
-parser.add_option('--recenter', metavar='recenter', type=int, default=1, help='Whether to recenter features matrix so that only individuals participating in the model fitting stage will have zero mean for every feature (1 or 0)')
-parser.add_option('--maxFixedIters', metavar='maxFixedIters', type=int, default=100, help='Max number of iterations for fitting of fixed effects')
-parser.add_option('--epsilon', metavar='epsilon', type=float, default=1e-3, help='Convergence cutoff for fitting of fixed effects')
-parser.add_option('--missingPhenotype', metavar='missingPhenotype', default='-9', help='identifier for missing values (default: -9)')
-(options, args) = parser.parse_args()
-
-
 
 
 def evalProbitReg(beta, X, cases, controls, thresholds, invRegParam, normPDF, h2):
@@ -81,7 +46,7 @@ def probitRegHessian(beta, X, cases, controls, thresholds, invRegParam, normPDF,
 	return H
 	
 
-def probitRegression(X, y, thresholds, numSNPs, numFixedFeatures, h2):
+def probitRegression(X, y, thresholds, numSNPs, numFixedFeatures, h2, useHess, maxFixedIters, epsilon, nofail):
 
 	regParam = h2 /  float(numSNPs)	
 	Linreg = sklearn.linear_model.Ridge(alpha=1.0/(2*regParam), fit_intercept=False, normalize=False, solver='lsqr')		
@@ -94,7 +59,7 @@ def probitRegression(X, y, thresholds, numSNPs, numFixedFeatures, h2):
 	controls = (y==0)
 	cases = (y==1)
 	funcToSolve = evalProbitReg
-	hess =(None if options.hess == 0 else probitRegHessian)
+	hess =(probitRegHessian if useHess else None)
 	jac= True
 	method = 'Newton-CG'
 	args = (X, cases, controls, thresholds, invRegParam, normPDF, h2)
@@ -105,14 +70,14 @@ def probitRegression(X, y, thresholds, numSNPs, numFixedFeatures, h2):
 	if (not optObj.success):
 		print 'Optimization status:', optObj.status
 		print optObj.message
-		if (options.nofail == 0): raise Exception('Probit regression failed with message: ' + optObj.message)
+		if (nofail == 0): raise Exception('Probit regression failed with message: ' + optObj.message)
 	beta = optObj.x
 			
 	#Fit fixed effects
 	if (numFixedFeatures > 0):
 		thresholdsEM = np.zeros(X.shape[0]) + thresholds
 		
-		for i in xrange(options.maxFixedIters):
+		for i in xrange(maxFixedIters):
 			print 'Beginning fixed effects iteration', i+1
 			t0 = time.time()
 			prevBeta = beta.copy()
@@ -135,73 +100,32 @@ def probitRegression(X, y, thresholds, numSNPs, numFixedFeatures, h2):
 			diff = np.sqrt(np.mean(beta[:numFixedFeatures]**2 - prevBeta[:numFixedFeatures]**2))
 			print 'Done in', '%0.2f'%(time.time()-t0), 'seconds'
 			print 'Diff:', '%0.4e'%diff
-			if (diff < options.epsilon): break
+			if (diff < epsilon): break
 	return beta
 	
 
 
-def probitMain(bfilesim, pheno, h2, prev, outFile, eigen=None, extractSim=None, covar=None, thresholds=None, nofail=0, 
-				relCutoff=0.05, numSkipTopPCs=0, numFixedPCs=0, hess=1, bfile=None, resfile=None, pthresh=5e-8, mineig=1e-3, extract=None, relatedFile=None,
-				mindist=0, recenter=1, maxFixedIters=100, epsilon=1e-3, missingPhenotype='-9'):
+def probit(bed, pheno, h2, prev, eigen, outFile, keepArr, covar, thresholds, nofail,
+				numSkipTopPCs, mineig, hess, recenter, maxFixedIters, epsilon):
 				
-	options.bfilesim = bfilesim
-	options.pheno = pheno
-	options.h2 = h2
-	options.prev = prev
-	options.out = outFile
-	options.eigen = eigen
-	options.extractSim = extractSim
-	options.covar = covar
-	options.thresholds = thresholds
-	options.nofail = nofail
-	options.relCutoff = relCutoff
-	options.numSkipTopPCs = numSkipTopPCs
-	options.numFixedPCs = numFixedPCs
-	options.hess = hess
-	options.bfile = bfile
-	options.resfile = resfile
-	options.pthresh = pthresh
-	options.mineig = mineig
-	options.extract = extract	
-	options.related = relatedFile
-	options.mindist = mindist
-	options.recenter = recenter
-	options.maxFixedIters = maxFixedIters
-	options.epsilon = epsilon
-	options.missingPhenotype = missingPhenotype
-
-	#Read bfile and pheno file
-	bed, phe = leapUtils.loadData(options.bfilesim, options.extractSim, options.pheno, options.missingPhenotype, loadSNPs=(options.eigen is None))
-
-	#Load eigen file
-	if (options.eigen is not None):
-		eigen = np.load(options.eigen)
-		S = eigen['arr_1'] * bed.sid.shape[0]
-		U = eigen['arr_0']
-	else:
-		print 'Computing kinship matrix...'	
-		t0 = time.time()
-		XXT = leapUtils.symmetrize(blas.dsyrk(1.0, bed.val, lower=1))
-		print 'Done in %0.2f'%(time.time()-t0), 'seconds'	
-		S,U = leapUtils.eigenDecompose(XXT)
-		
+	bed, pheno = leapUtils._fixupBedAndPheno(bed, pheno)
+				
+	#Extract phenotype
+	if isinstance(pheno, dict):	phe = pheno['vals']
+	else: phe = pheno		
+	if (len(phe.shape)==2):
+		if (phe.shape[1]==1): phe=phe[:,0]
+		else: raise Exception('More than one phenotype found')		
+	if (keepArr is None): keepArr = np.ones(phe.shape[0], dtype=np.bool)				
+				
+	S = eigen['arr_1'] * bed.sid.shape[0]
+	U = eigen['arr_0']
 	S = np.sqrt(S)
-	goodS = (S>options.mineig)
-	if (options.numSkipTopPCs > 0): goodS[-options.numSkipTopPCs:] = False
-	print 'Removing', np.sum(~goodS), 'PCs with low variance'
+	goodS = (S>mineig)
+	if (numSkipTopPCs > 0): goodS[-numSkipTopPCs:] = False
+	if (np.sum(~goodS) > 0): print 'Removing', np.sum(~goodS), 'PCs with low variance'	
 	G = U[:, goodS]*S[goodS]
 	
-	#Compute relatedness
-	if (options.relCutoff <= 0): keepArr = np.ones(bed.iid.shape[0], dtype=bool)
-	else:
-		bed2 = bed
-		if (options.related is None):
-			if (options.extractSim is not None): bed2, _ = leapUtils.loadData(options.bfilesim, None, options.pheno, options.missingPhenotype, loadSNPs=True)			
-			keepArr = leapUtils.findRelated(bed2, options.relCutoff)
-		else:
-			keepArr = leapUtils.loadRelatedFile(bed, options.related)	
-
-
 	#Set binary vector
 	pheUnique = np.unique(phe)
 	if (pheUnique.shape[0] != 2): raise Exception('phenotype file has more than two values')
@@ -210,88 +134,137 @@ def probitMain(bfilesim, pheno, h2, prev, outFile, eigen=None, extractSim=None, 
 	phe[~cases] = 0
 	phe[cases] = 1
 
-	#Add significant SNPs as fixed effects
-	numFixedFeatures = options.numFixedPCs
-	if (options.resfile is not None):	
-		bed_fixed, _ = leapUtils.loadData(options.bfile, options.extract, options.pheno, options.missingPhenotype, loadSNPs=True)
-		snpCovarsMat = leapUtils.getSNPCovarsMatrix(bed_fixed, options.resfile, options.pthresh, options.mindist)	
-		snpCovarsMat *= np.mean(np.std(G, axis=0))
-		G = np.concatenate((snpCovarsMat, G), axis=1)
-		numFixedFeatures += snpCovarsMat.shape[1]
-		print 'using', snpCovarsMat.shape[1], 'SNPs as covariates'
-		
-	#Read covar file
-	if (options.covar is not None):	
-		covar = leapUtils.loadCovars(bed, options.covar)	
-		covar *= np.mean(np.std(G, axis=0))	
-		G = np.concatenate((covar, G), axis=1)
-		numFixedFeatures += covar.shape[1]
-		print 'Read', covar.shape[1], 'covariates from file'
-		
-		
 	#run probit regression
-	t = stats.norm(0,1).isf(options.prev)
-	if (options.thresholds is not None):
-		t = np.loadtxt(options.thresholds, usecols=[0])
+	t = stats.norm(0,1).isf(prev)
+	if (thresholds is not None): t = thresholds
 
 	#Recenter G	to only consider the unrelated individuals
-	if (options.recenter==1): G -= np.mean(G[keepArr, :], axis=0)
+	if recenter: G -= np.mean(G[keepArr, :], axis=0)
 	else: G -= np.mean(G, axis=0)
+	
+	numFixedFeatures = 0
+	if (covar is not None):
+		covar *= np.mean(np.std(G, axis=0))
+		G = np.concatenate((covar, G), axis=1)
+		numFixedFeatures += covar.shape[1]
 
 	#Run Probit regression
-	if (options.thresholds is None): beta = probitRegression(G[keepArr, :], phe[keepArr], t, bed.sid.shape[0], numFixedFeatures, options.h2)
-	else: beta = probitRegression(G[keepArr, :], phe[keepArr], t[keepArr], bed.sid.shape[0], numFixedFeatures, options.h2)
+	probitThresh = (t if thresholds is None else t[keepArr])
+	beta = probitRegression(G[keepArr, :], phe[keepArr], probitThresh, bed.sid.shape[0], numFixedFeatures, h2, hess, maxFixedIters, epsilon, nofail)
 
 	#Predict liabilities for all individuals
 	meanLiab = G.dot(beta)		
 	liab = meanLiab.copy()
 	indsToFlip = ((liab <= t) & (phe>0.5)) | ((liab > t) & (phe<0.5))
-	liab[indsToFlip] = stats.norm(0,1).isf(options.prev)
-
-	#save liabilities
-	f = open(options.out+'.liabs', 'w')
-	for ind_i,[fid,iid] in enumerate(bed.iid): f.write(' '.join([fid, iid, '%0.3f'%liab[ind_i]]) + '\n')		
-	f.close()
-
-
-	# #save mean liabilities
-	# f = open(options.out+'.meanliabs', 'w')
-	# for ind_i,[fid,iid] in enumerate(bed.iid): f.write(' '.join([fid, iid, '%0.3f'%meanLiab[ind_i]]) + '\n')		
-	# f.close()
-
-	# #save residuals
-	# residuals = liab - meanLiab
-	# f = open(options.out+'.residuals', 'w')
-	# for ind_i,[fid,iid] in enumerate(bed.iid): f.write(' '.join([fid, iid, '%0.3f'%residuals[ind_i]]) + '\n')		
-	# f.close()	
-
-	#save liabilities after regressing out the fixed effects
-	if (numFixedFeatures > 0):
-		liab_nofixed = liab - G[:, :numFixedFeatures].dot(beta[:numFixedFeatures])
-		f = open(options.out+'.liab_nofixed', 'w')
-		for ind_i,[fid,iid] in enumerate(bed.iid): f.write(' '.join([fid, iid, '%0.3f'%liab_nofixed[ind_i]]) + '\n')		
+	liab[indsToFlip] = stats.norm(0,1).isf(prev)
+	
+	if (outFile is not None):
+		#save liabilities
+		f = open(outFile+'.liabs', 'w')
+		for ind_i,[fid,iid] in enumerate(bed.iid): f.write(' '.join([fid, iid, '%0.3f'%liab[ind_i]]) + '\n')		
 		f.close()
-		
-		liab_nofixed2 = meanLiab - G[:, :numFixedFeatures].dot(beta[:numFixedFeatures])
-		indsToFlip = ((liab_nofixed2 <= t) & (phe>0.5)) | ((liab_nofixed2 > t) & (phe<0.5))
-		liab_nofixed2[indsToFlip] = stats.norm(0,1).isf(options.prev)
-		f = open(options.out+'.liab_nofixed2', 'w')
-		for ind_i,[fid,iid] in enumerate(bed.iid): f.write(' '.join([fid, iid, '%0.3f'%liab_nofixed2[ind_i]]) + '\n')		
-		f.close()	
 
+		#save liabilities after regressing out the fixed effects
+		if (numFixedFeatures > 0):
+			liab_nofixed = liab - G[:, :numFixedFeatures].dot(beta[:numFixedFeatures])
+			f = open(outFile+'.liab_nofixed', 'w')
+			for ind_i,[fid,iid] in enumerate(bed.iid): f.write(' '.join([fid, iid, '%0.3f'%liab_nofixed[ind_i]]) + '\n')		
+			f.close()
+			
+			liab_nofixed2 = meanLiab - G[:, :numFixedFeatures].dot(beta[:numFixedFeatures])
+			indsToFlip = ((liab_nofixed2 <= t) & (phe>0.5)) | ((liab_nofixed2 > t) & (phe<0.5))
+			liab_nofixed2[indsToFlip] = stats.norm(0,1).isf(prev)
+			f = open(outFile+'.liab_nofixed2', 'w')
+			for ind_i,[fid,iid] in enumerate(bed.iid): f.write(' '.join([fid, iid, '%0.3f'%liab_nofixed2[ind_i]]) + '\n')		
+			f.close()	
+			
+	#Return phenotype struct with liabilities
+	liabsStruct = {
+		'header':[None],
+		'vals':liab,
+		'iid':bed.iid
+	}
+	return liabsStruct
 
 		
 		
 if __name__ == '__main__':		
-	if (options.extract is not None and options.bfile is None): raise Exception('--extract cannot be used without --bfile')
-	if (options.bfile is not None and options.resfile is None): raise Exception('--bfile cannot be used without --resfile')
-	if (options.bfilesim is None): raise Exception('bfilesim must be supplied')
-	if (options.pheno is None): raise Exception('phenotype file must be supplied')
-	if (options.out is None):   raise Exception('output file name must be supplied')
-	if (options.prev is None): raise Exception('prevlence must be supplied')
-	if (options.h2 is None): raise Exception('heritability must be supplied')
-	probitMain(options.bfilesim, options.pheno, options.h2, options.prev, options.out, options.eigen, options.extractSim, options.covar,
-				options.thresholds, options.nofail, options.relCutoff, options.numSkipTopPCs, options.numFixedPCs, options.hess, 
-				options.bfile, options.resfile, options.pthresh, options.mineig, options.extract, options.related,
-				options.mindist, options.recenter, options.maxFixedIters, options.epsilon, options.missingPhenotype)
+
+	parser = argparse.ArgumentParser()
+	parser.add_argument('--bfilesim', metavar='bfilesim', default=None, help='Binary plink file')
+	parser.add_argument('--pheno', metavar='pheno', default=None, help='Phenotype file in Plink format')
+	parser.add_argument('--h2', metavar='h2', type=float, default=None, help='Liability heritability')
+	parser.add_argument('--eigen', metavar='eigen', default=None, help='eigen file')
+	parser.add_argument('--prev', metavar='prev', type=float, default=None, help='Trait prevalence')
+	parser.add_argument('--extractSim', metavar='extractSim', default=None, help='SNPs subset to use')
+	parser.add_argument('--out', metavar='out', default=None, help='output file')
+
+	parser.add_argument('--covar', metavar='covar', default=None, help='covariates file in FastLMM format')
+	parser.add_argument('--thresholds', metavar='thresholds', default=None, help="liability thresholds file")
+	parser.add_argument('--nofail', metavar='nofail', type=int, default=0, help="Do not raise exception if Probit fitting failed")
+
+	parser.add_argument('--relCutoff', metavar='relCutoff', type=float, default=0.05, help='Relatedness cutoff')
+	parser.add_argument('--numSkipTopPCs', metavar='numSkipTopPCs', type=int, default=0, help='Number of PCs to skip')
+	parser.add_argument('--numFixedPCs', metavar='numFixedPCs', type=int, default=0, help='Number of PCs to use as fixed effects')
+	parser.add_argument('--hess', metavar='hess', type=int, default=1, help='Whether to compute Hessian analytically (1) or not (0)')
+	parser.add_argument('--bfile', metavar='bfile', default=None, help='Binary plink file with SNPs that can be used as fixed effects')
+	parser.add_argument('--resfile', metavar='resfile', default=None, help='A linear regression results file in FastLMM format, used to choose SNPs that will be used as fixed effects')
+	parser.add_argument('--pthresh', metavar='pthresh', type=float, default=5e-8, help='p-value cutoff below which SNPs will be used as fixed effects')
+	parser.add_argument('--mineig', metavar='mineig', type=float, default=1e-3, help='eigenvectors with singular value below this value will not be used')
+	parser.add_argument('--extract', metavar='extract', default=None, help='subset of SNPs to be considered as fixed effects')
+	parser.add_argument('--related', metavar='related', default=None, help='File with info about related individuals to remove')
+	parser.add_argument('--mindist', metavar='mindist', type=int, default=0, help='Minimum distance between fixed effects SNPs')
+	parser.add_argument('--recenter', metavar='recenter', type=int, default=1, help='Whether to recenter features matrix so that only individuals participating in the model fitting stage will have zero mean for every feature (1 or 0)')
+	parser.add_argument('--maxFixedIters', metavar='maxFixedIters', type=int, default=100, help='Max number of iterations for fitting of fixed effects')
+	parser.add_argument('--epsilon', metavar='epsilon', type=float, default=1e-3, help='Convergence cutoff for fitting of fixed effects')
+	parser.add_argument('--missingPhenotype', metavar='missingPhenotype', default='-9', help='identifier for missing values (default: -9)')
+	args = parser.parse_args()
+
+
+	if (args.extract is not None and args.bfile is None): raise Exception('--extract cannot be used without --bfile')
+	if (args.bfile is not None and args.resfile is None): raise Exception('--bfile cannot be used without --resfile')
+	if (args.bfilesim is None): raise Exception('bfilesim must be supplied')
+	if (args.pheno is None): raise Exception('phenotype file must be supplied')
+	if (args.out is None):   raise Exception('output file name must be supplied')
+	if (args.prev is None): raise Exception('prevlence must be supplied')
+	if (args.h2 is None): raise Exception('heritability must be supplied')
+	
+	#Read bfilesim and pheno file for heritability computation	
+	bed, phe = leapUtils.loadData(args.bfilesim, args.extractSim, args.pheno, args.missingPhenotype, loadSNPs=(args.eigen is None), standardize=True)
+	
+	#Read/create eigendecomposition
+	if (args.eigen is not None): eigen = np.load(args.eigen)
+	else:
+		import eigenDecompose
+		eigen = eigenDecompose.eigenDecompose(bed)	
+
+	#Compute relatedness
+	if (args.relCutoff <= 0): keepArr = np.ones(bed.iid.shape[0], dtype=bool)
+	else:		
+		if (args.related is None):
+			bed2 = bed
+			if (args.extractSim is not None or args.eigen is not None): bed2, _ = leapUtils.loadData(args.bfilesim, None, args.pheno, args.missingPhenotype, loadSNPs=True)			
+			keepArr = leapUtils.findRelated(bed2, args.relCutoff)
+		else:
+			keepArr = leapUtils.loadRelatedFile(bed, args.related)	
+	
+	
+	#Add significant SNPs as fixed effects	
+	covar = None
+	if (args.resfile is not None):	
+		bed_fixed, _ = leapUtils.loadData(args.bfile, args.extract, args.pheno, args.missingPhenotype, loadSNPs=True)
+		covar = leapUtils.getSNPCovarsMatrix(bed_fixed, args.resfile, args.pthresh, args.mindist)		
+		print 'using', covar.shape[1], 'SNPs as covariates'		
+	#Read covar file
+	if (args.covar is not None):		
+		covarsMat = leapUtils.loadCovars(bed, covar)			
+		print 'Read', covarsMat.shape[1], 'covariates from file'
+		if (covar is None): covar = covarsMat
+		else: covar = np.concatenate((covar, covarsMat), axis=1)
+		
+	if (args.thresholds is not None): thresholds = np.loadtxt(args.thresholds, usecols=[0])
+	else: thresholds = None
+	
+	leapMain.probit(bed, phe, args.h2, args.prev, eigen, args.out, keepArr, covar, thresholds, args.nofail==1, 
+				args.numSkipTopPCs, args.mineig, args.hess==1, args.recenter==1, args.maxFixedIters, args.epsilon)
 		

@@ -9,7 +9,6 @@ np.set_printoptions(precision=3, linewidth=200)
 import leapUtils
 import leapMain
 
-
 def calcLiabThreholds(U, S, keepArr, phe, numRemovePCs, prev):
 
 	#Run logistic regression
