@@ -20,7 +20,7 @@ Typically, the LEAP scripts will be installed at:
 
 LEAP is particularly easy to install using the [Anaconda Python distribution](https://store.continuum.io/cshop/anaconda). The [numerically optimized version](http://continuum.io/blog/mkl-optimizations) of Anaconda can speed LEAP up by several orders of magnitude.
 
-Alternatively (if Anaconda can't be installed), for very fast performance it is recommended to have an optimized version of Numpy/Scipy [installed on your system](http://www.scipy.org/scipylib/building), using optimized numerical libraries such as [OpenBLAS](http://www.openblas.net) or [Intel MKL](https://software.intel.com/en-us/intel-mkl) (see [Compilation instructions for scipy with Intel MKL)](https://software.intel.com/en-us/articles/numpyscipy-with-intel-mkl). 
+Alternatively (if numerically optimized Anaconda can't be installed), for very fast performance it is recommended to have an optimized version of Numpy/Scipy [installed on your system](http://www.scipy.org/scipylib/building), using optimized numerical libraries such as [OpenBLAS](http://www.openblas.net) or [Intel MKL](https://software.intel.com/en-us/intel-mkl) (see [Compilation instructions for scipy with Intel MKL)](https://software.intel.com/en-us/articles/numpyscipy-with-intel-mkl).
 
 To install LEAP manually, you need the following dependencies:
 * Python 2.7
@@ -38,7 +38,7 @@ Usage instructions
 There are two ways to run LEAP.
 The first is via a Python API. A detailed explanation about this option is provided in the [LEAP Ipython notebook](http://nbviewer.ipython.org/github/omerwe/LEAP/blob/master/leap/regression/Leap_example.ipynb).
 
-The second option is to run LEAP though a series of Python scripts, as detailed below. This option is more suitable for those not familiar with Python. The script leapUtils.sh runs the full LEAP pipeline on a small example dataset, and can be used for reference.
+The second option is to run LEAP though a series of Python scripts, as detailed below. This option is more suitable for those not familiar with Python. The script leap_pipeline.sh runs the full LEAP pipeline on a small example dataset, and can be used for reference.
  
 Generally, LEAP uses the same file formats as [FaST-LMM](https://github.com/MicrosoftGenomics/FaST-LMM).
 Namely, input files are in [binary Plink format](http://pngu.mgh.harvard.edu/~purcell/plink/data.shtml#bed).
@@ -75,7 +75,7 @@ This script outputs the heritability estimate. The optional eigen file is the on
 ```
 python probit.py --bfilesim <Plink base file> --pheno <phenotype file> --prev <prevalence> --out <output base file> --h2 <heritability> [--eigen <eigen file> --extractSim <SNPs used in the liability estimation> --related <relatedness file>]
 ```
-This script creates a file called \<output base file\>.liabs, with estimated liabilities for every individual. The estimated liabilities can be used directly for GWAS by using them as a standard phenotype file. The eigen file is the one computes in stage 2, and the h2 parameter should be the heritability estimate from stage 3. The extractSim and relatedness file parameters should be the same as in stage 3.
+This script creates a file called \<output base file\>.liabs, with estimated liabilities for every individual. The estimated liabilities can be used directly for GWAS by using them as a standard phenotype file. The eigen file is the one computed in stage 2, and the h2 parameter should be the heritability estimate from stage 3. The extractSim and relatedness file parameters should be the same as in stage 3.
 
 **5) Test for Associations:**
 ```
@@ -88,7 +88,7 @@ The bfile and bfilesim parameters can both point to the same file. In this case,
 -----------------
 General comments and tips
 -------------------------
-**1)** Fixed effects can be included in stages 2-4 by adding the flag --covar.
+**1)** Fixed effects can be included in stages 3-5 by adding the flag --covar.
 Please type
 ```
 python probit.py --help
@@ -97,7 +97,7 @@ and
 ```
 python leap_gwas.py --help
 ```
-for instructions. However, we note that under extreme ascertainment, it is recommded to use covariates only in stages 2-3 (see the paper for details).
+for instructions. However, we note that under extreme ascertainment, it is recommded to use covariates only in stages 3-4 (see the paper for details).
  
 **2)** As described in the main text, it is recommended to perform a different liability estimation for every excluded chromosome, and then testing the SNPs on the excluded chromosome for association with the estimated liabilities. The -extractSim flag is useful for this. Please see the example file leap_pipeline.sh for a usage example.
  
