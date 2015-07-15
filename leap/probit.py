@@ -188,7 +188,7 @@ def probit(bed, pheno, h2, prev, eigen, outFile, keepArr, covar, thresholds, nof
 
 		
 		
-if __name__ == '__main__':		
+if __name__ == '__main__':
 
 	parser = argparse.ArgumentParser()
 	parser.add_argument('--bfilesim', metavar='bfilesim', default=None, help='Binary plink file')
@@ -257,7 +257,7 @@ if __name__ == '__main__':
 		print 'using', covar.shape[1], 'SNPs as covariates'		
 	#Read covar file
 	if (args.covar is not None):		
-		covarsMat = leapUtils.loadCovars(bed, covar)			
+		covarsMat = leapUtils.loadCovars(bed, args.covar)			
 		print 'Read', covarsMat.shape[1], 'covariates from file'
 		if (covar is None): covar = covarsMat
 		else: covar = np.concatenate((covar, covarsMat), axis=1)
