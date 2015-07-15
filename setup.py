@@ -37,7 +37,7 @@ else:
 #python setup.py sdist bdist_wininst upload
 setup(
     name='leap_gwas',
-    version='0.1.6',
+    version='0.1.7.2',
     description='Liability Estimation in Case Control Studies',
     long_description=readme(),
     keywords='gwas bioinformatics LMMs MLMs',
