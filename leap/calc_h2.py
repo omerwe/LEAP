@@ -228,7 +228,9 @@ if __name__ == '__main__':
 			
 	#Read covar file
 	if (args.covar is not None):		
-		covar = leapUtils.loadCovars(bed, args.covar)			
+		covar = leapUtils.loadCovars(bed, args.covar)	
+		covar -= covar.mean()
+		covar /= covar.std()
 		print 'Read', covar.shape[1], 'covariates from file'
 	else:
 		covar = None		
