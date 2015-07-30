@@ -9,17 +9,23 @@ np.set_printoptions(precision=3, linewidth=200)
 import leapUtils
 import leapMain
 
-def calcLiabThreholds(U, S, keepArr, phe, numRemovePCs, prev):
+
+def calcLiabThreholds(U, S, keepArr, phe, numRemovePCs, prev, covar):
 
 	#Run logistic regression
-	G = U[:, -numRemovePCs:] * np.sqrt(S[-numRemovePCs:])
+	if (numRemovePCs > 0):
+		G = U[:, -numRemovePCs:] * np.sqrt(S[-numRemovePCs:])
+	else:
+		G = np.empty((phe.shape[0], 0))
+	if (covar is not None): G = np.concatenate((G, covar), axis=1)
+	
 	Logreg = sklearn.linear_model.LogisticRegression(penalty='l2', C=500000, fit_intercept=True)
-	Logreg.fit(G[keepArr, :numRemovePCs], phe[keepArr])
+	Logreg.fit(G[keepArr, :], phe[keepArr])
 	
 	#Compute individual thresholds
 	Pi = Logreg.predict_proba(G)[:,1]
 
-	#Compute thresholds and save to files
+	#Compute thresholds
 	P = np.sum(phe==1) / float(phe.shape[0])
 	K = prev
 	Ki = K*(1-P) / (P*(1-K)) * Pi / (1 + K*(1-P) / (P*(1-K))*Pi - Pi)
@@ -126,7 +132,7 @@ def calcH2Binary(XXT, phe, probs, thresholds, keepArr, prev, h2coeff):
 		
 		
 		
-def calc_h2(pheno, prev, eigen, keepArr, numRemovePCs, h2coeff, lowtail):
+def calc_h2(pheno, prev, eigen, keepArr, covar, numRemovePCs, h2coeff, lowtail):
 
 	pheno = leapUtils._fixup_pheno(pheno)
 
@@ -147,6 +153,8 @@ def calc_h2(pheno, prev, eigen, keepArr, numRemovePCs, h2coeff, lowtail):
 		else: S, U = eigen['arr_1'], eigen['arr_0']		
 		print 'Removing the top', numRemovePCs, 'PCs from the kinship matrix'
 		XXT -= (U[:, -numRemovePCs:]*S[-numRemovePCs:]).dot(U[:, -numRemovePCs:].T)		
+	else:
+		U, S = None, None
 		
 	#Determine if this is a case-control study
 	pheUnique = np.unique(phe)
@@ -158,11 +166,12 @@ def calc_h2(pheno, prev, eigen, keepArr, numRemovePCs, h2coeff, lowtail):
 		pheMean = phe.mean()	
 		phe[phe <= pheMean] = 0
 		phe[phe > pheMean] = 1
-		if (numRemovePCs > 0):
-			probs, thresholds = calcLiabThreholds(U, S, keepArr, phe, numRemovePCs, prev)
+		if (numRemovePCs > 0 or covar is not None):
+			probs, thresholds = calcLiabThreholds(U, S, keepArr, phe, numRemovePCs, prev, covar)
 			h2 = calcH2Binary(XXT, phe, probs, thresholds, keepArr, prev, h2coeff)
 		else: h2 = calcH2Binary(XXT, phe, None, None, keepArr, prev, h2coeff)
 	else:
+		if (covar is not None): raise Exception('Covariates with a continuous phenotype are currently not supported')
 		print 'Computing h2 for a continuous phenotype'
 		if (not lowtail): h2 = calcH2Continuous(XXT, phe, keepArr, prev, h2coeff)
 		else: h2 = calcH2Continuous_twotails(XXT, phe, keepArr, prev, h2coeff)
@@ -184,6 +193,7 @@ if __name__ == '__main__':
 	parser.add_argument('--pheno', metavar='pheno', default=None, help='Phenotype file in Plink format')
 	parser.add_argument('--eigen', metavar='eigen', default=None, help='eigen file')
 	parser.add_argument('--related', metavar='related', default=None, help='relatedness file')
+	parser.add_argument('--covar', metavar='covar', default=None, help='covariates file')
 
 	parser.add_argument('--lowtail', metavar='lowtail', type=int, default=0, help='Assume that both tails of the liabilities distribution are oversampled (0 or 1 - default 0)')
 	parser.add_argument('--h2coeff', metavar='h2coeff', type=float, default=0.875, help='Heritability coefficient (set to 1.0 for synthetic data or for downstream analysis with LEAP)')
@@ -214,8 +224,16 @@ if __name__ == '__main__':
 			keepArr = leapUtils.findRelated(bed2, args.relCutoff)
 		else:
 			keepArr = leapUtils.loadRelatedFile(bed, args.related)
+			
+			
+	#Read covar file
+	if (args.covar is not None):		
+		covar = leapUtils.loadCovars(bed, args.covar)			
+		print 'Read', covar.shape[1], 'covariates from file'
+	else:
+		covar = None		
 	
-	leapMain.calcH2(phe, args.prev, eigen, keepArr, args.numRemovePCs, args.h2coeff, args.lowtail==1)
+	leapMain.calcH2(phe, args.prev, eigen, keepArr, covar, args.numRemovePCs, args.h2coeff, args.lowtail==1)
 
 
 
