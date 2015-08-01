@@ -106,7 +106,7 @@ def probitRegression(X, y, thresholds, numSNPs, numFixedFeatures, h2, useHess, m
 
 
 def probit(bed, pheno, h2, prev, eigen, outFile, keepArr, covar, thresholds, nofail,
-				numSkipTopPCs, mineig, hess, recenter, maxFixedIters, epsilon):
+				numSkipTopPCs, mineig, hess, recenter, maxFixedIters, epsilon, treatFixedAsRandom=False):
 				
 	bed, pheno = leapUtils._fixupBedAndPheno(bed, pheno)
 				
@@ -144,9 +144,11 @@ def probit(bed, pheno, h2, prev, eigen, outFile, keepArr, covar, thresholds, nof
 	
 	numFixedFeatures = 0
 	if (covar is not None):
+		covar -= covar.mean()
+		covar /= covar.std()
 		covar *= np.mean(np.std(G, axis=0))
 		G = np.concatenate((covar, G), axis=1)
-		numFixedFeatures += covar.shape[1]
+		if (not treatFixedAsRandom): numFixedFeatures += covar.shape[1]
 
 	#Run Probit regression
 	probitThresh = (t if thresholds is None else t[keepArr])
@@ -202,6 +204,7 @@ if __name__ == '__main__':
 	parser.add_argument('--covar', metavar='covar', default=None, help='covariates file in FastLMM format')
 	parser.add_argument('--thresholds', metavar='thresholds', default=None, help="liability thresholds file")
 	parser.add_argument('--nofail', metavar='nofail', type=int, default=0, help="Do not raise exception if Probit fitting failed")
+	parser.add_argument('--treatFixedAsRandom', metavar='treatFixedAsRandom', type=int, default=0, help="Whether to treat fixed effects as random effects")
 
 	parser.add_argument('--relCutoff', metavar='relCutoff', type=float, default=0.05, help='Relatedness cutoff')
 	parser.add_argument('--numSkipTopPCs', metavar='numSkipTopPCs', type=int, default=0, help='Number of PCs to skip')
@@ -264,7 +267,7 @@ if __name__ == '__main__':
 		
 	if (args.thresholds is not None): thresholds = np.loadtxt(args.thresholds, usecols=[0])
 	else: thresholds = None
-	
+
 	leapMain.probit(bed, phe, args.h2, args.prev, eigen, args.out, keepArr, covar, thresholds, args.nofail==1, 
-				args.numSkipTopPCs, args.mineig, args.hess==1, args.recenter==1, args.maxFixedIters, args.epsilon)
+				args.numSkipTopPCs, args.mineig, args.hess==1, args.recenter==1, args.maxFixedIters, args.epsilon, treatFixedAsRandom=args.treatFixedAsRandom>=1)
 		
