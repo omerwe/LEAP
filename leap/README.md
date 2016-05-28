@@ -68,7 +68,7 @@ This script computes a kinship matrix and its eigendecomposition, and saves them
  
 **3) Compute heritability using the method of [Golan et al.](http://www.pnas.org/content/111/49/E5272.long):**
 ```
-python calc_h2.py --bfilesim <Plink base file> --prev <prevalence> --pheno <phenotype file> --h2coeff 1.0 [--eigen <eigen file> --extractSim <SNPs used for heritability estimation>  --related <relatedness file> --h2coeff <heritability coefficient>]
+python calc_h2.py --bfilesim <Plink base file> --prev <prevalence> --pheno <phenotype file> [--eigen <eigen file> --extractSim <SNPs used for heritability estimation>  --related <relatedness file>]
 ```
 This script outputs the heritability estimate. The optional eigen file is the one created in stage 2. The optional extractSim file is a text file with a list of SNP names (one SNP per line) that will be used for heritability estimation. It is recommended to perform a different heritability and liability estimation for every excluded chromosome, and then testing the SNPs on the excluded chromosome for association with the estimated liabilities. The bfilesim and extractSim parameters must be the same as the ones used in stage 2. The optional relatedness file should be the output of stage 1, and is used to exclude related individuals from the analysis, which improves analysis results.
 
