@@ -36,7 +36,7 @@ def calcLiabThreholds(U, S, keepArr, phe, numRemovePCs, prev, covar):
 	return Pi, thresholds
 	
 	
-def calcH2Continuous_twotails(XXT, phe, keepArr, prev, h2coeff):
+def calcH2Continuous_twotails(XXT, phe, keepArr, prev):
 
 	print 'computing h2 for a two-tails ascertained study...'
 	
@@ -57,7 +57,7 @@ def calcH2Continuous_twotails(XXT, phe, keepArr, prev, h2coeff):
 	pheMean = 0
 	pheVar = 1
 	
-	x = (xCoeff * h2coeff) * XXT 
+	x = xCoeff * XXT 
 	y = np.outer((phe-pheMean)/np.sqrt(pheVar), (phe-pheMean)/np.sqrt(pheVar))
 	y -= intersect
 	
@@ -69,7 +69,7 @@ def calcH2Continuous_twotails(XXT, phe, keepArr, prev, h2coeff):
 	
 	
 
-def calcH2Continuous(XXT, phe, keepArr, prev, h2coeff):
+def calcH2Continuous(XXT, phe, keepArr, prev):
 	t = stats.norm(0,1).isf(prev)
 	phit = stats.norm(0,1).pdf(t)
 	
@@ -84,7 +84,7 @@ def calcH2Continuous(XXT, phe, keepArr, prev, h2coeff):
 	phe = phe[keepArr]
 	
 	xCoeff = (((R-1)*phit*t + K1 + R*K2)**2 * (K1+R*K2)**2 - ((R-1)*phit)**4) / (K1 + R*K2)**4
-	x = (xCoeff * h2coeff) * XXT 
+	x = xCoeff * XXT 
 	pheMean = 0
 	pheVar = 1	
 	y = np.outer((phe-pheMean) / np.sqrt(pheVar), (phe-pheMean)/np.sqrt(pheVar))
@@ -98,7 +98,7 @@ def calcH2Continuous(XXT, phe, keepArr, prev, h2coeff):
 	
 	
 	
-def calcH2Binary(XXT, phe, probs, thresholds, keepArr, prev, h2coeff):
+def calcH2Binary(XXT, phe, probs, thresholds, keepArr, prev):
 	K = prev
 	P = np.sum(phe>0) / float(phe.shape[0])
 	
@@ -108,7 +108,7 @@ def calcH2Binary(XXT, phe, probs, thresholds, keepArr, prev, h2coeff):
 	if (thresholds is None):
 		t = stats.norm(0,1).isf(K)
 		phit = stats.norm(0,1).pdf(t)
-		xCoeff = P*(1-P) / (K**2 * (1-K)**2) * phit**2 * h2coeff
+		xCoeff = P*(1-P) / (K**2 * (1-K)**2) * phit**2
 		y = np.outer((phe-P) / np.sqrt(P*(1-P)), (phe-P) / np.sqrt(P*(1-P)))
 		x = xCoeff * XXT
 		
@@ -122,7 +122,7 @@ def calcH2Binary(XXT, phe, probs, thresholds, keepArr, prev, h2coeff):
 		sumProbs = np.tile(np.column_stack(probs).T, (1,probs.shape[0])) + np.tile(probs, (probs.shape[0], 1))
 		Atag0 = np.outer(phit, phit) * (1 - (sumProbs)*(P-K)/(P*(1-K)) + np.outer(probs, probs)*(((P-K)/(P*(1-K)))**2)) / np.sqrt(probsInvOuter)
 		B0 = np.outer(Ki + (1-Ki)*(K*(1-P))/(P*(1-K)), Ki + (1-Ki)*(K*(1-P))/(P*(1-K)))
-		x = (Atag0 / B0 * h2coeff) * XXT	
+		x = Atag0 / B0 * XXT	
 	
 	y = y[np.triu_indices(y.shape[0], 1)]
 	x = x[np.triu_indices(x.shape[0], 1)]
@@ -132,7 +132,7 @@ def calcH2Binary(XXT, phe, probs, thresholds, keepArr, prev, h2coeff):
 		
 		
 		
-def calc_h2(pheno, prev, eigen, keepArr, covar, numRemovePCs, h2coeff, lowtail):
+def calc_h2(pheno, prev, eigen, keepArr, covar, numRemovePCs, lowtail):
 
 	pheno = leapUtils._fixup_pheno(pheno)
 
@@ -168,13 +168,13 @@ def calc_h2(pheno, prev, eigen, keepArr, covar, numRemovePCs, h2coeff, lowtail):
 		phe[phe > pheMean] = 1
 		if (numRemovePCs > 0 or covar is not None):
 			probs, thresholds = calcLiabThreholds(U, S, keepArr, phe, numRemovePCs, prev, covar)
-			h2 = calcH2Binary(XXT, phe, probs, thresholds, keepArr, prev, h2coeff)
-		else: h2 = calcH2Binary(XXT, phe, None, None, keepArr, prev, h2coeff)
+			h2 = calcH2Binary(XXT, phe, probs, thresholds, keepArr, prev)
+		else: h2 = calcH2Binary(XXT, phe, None, None, keepArr, prev)
 	else:
 		if (covar is not None): raise Exception('Covariates with a continuous phenotype are currently not supported')
 		print 'Computing h2 for a continuous phenotype'
-		if (not lowtail): h2 = calcH2Continuous(XXT, phe, keepArr, prev, h2coeff)
-		else: h2 = calcH2Continuous_twotails(XXT, phe, keepArr, prev, h2coeff)
+		if (not lowtail): h2 = calcH2Continuous(XXT, phe, keepArr, prev)
+		else: h2 = calcH2Continuous_twotails(XXT, phe, keepArr, prev)
 		
 	if (h2 <= 0): raise Exception("Negative heritability found. Exitting...")	
 	if (np.isnan(h2)): raise Exception("Invalid heritability estimate. Please double-check your input for any errors.")	
@@ -196,7 +196,6 @@ if __name__ == '__main__':
 	parser.add_argument('--covar', metavar='covar', default=None, help='covariates file')
 
 	parser.add_argument('--lowtail', metavar='lowtail', type=int, default=0, help='Assume that both tails of the liabilities distribution are oversampled (0 or 1 - default 0)')
-	parser.add_argument('--h2coeff', metavar='h2coeff', type=float, default=0.875, help='Heritability coefficient (set to 1.0 for synthetic data or for downstream analysis with LEAP)')
 	parser.add_argument('--relCutoff', metavar='relCutoff', type=float, default=0.05, help='relatedness cutoff (set to negative value to override relatedness check)')
 	parser.add_argument('--missingPhenotype', metavar='missingPhenotype', default='-9', help='identifier for missing values (default: -9)')
 	args = parser.parse_args()
@@ -235,7 +234,7 @@ if __name__ == '__main__':
 	else:
 		covar = None		
 	
-	leapMain.calcH2(phe, args.prev, eigen, keepArr, covar, args.numRemovePCs, args.h2coeff, args.lowtail==1)
+	leapMain.calcH2(phe, args.prev, eigen, keepArr, covar, args.numRemovePCs, args.lowtail==1)
 
 
 

@@ -71,11 +71,15 @@ def loadRelatedFile(bed, relFile):
 	return keepArr
 	
 	
-def findRelated(bed, cutoff):
-	print 'Computing kinship matrix...'
-	t0 = time.time()	
-	XXT = symmetrize(blas.dsyrk(1.0, bed.val, lower=1) / bed.val.shape[1])
-	print 'Done in %0.2f'%(time.time()-t0), 'seconds'
+def findRelated(bed, cutoff, kinshipFile=None):
+
+	if (kinshipFile is None):
+		print 'Computing kinship matrix...'
+		t0 = time.time()	
+		XXT = symmetrize(blas.dsyrk(1.0, bed.val, lower=1) / bed.val.shape[1])
+		print 'Done in %0.2f'%(time.time()-t0), 'seconds'
+	else:
+		XXT = np.loadtxt(kinshipFile)
 
 	#Find related individuals
 	removeSet = set(np.sort(vc.VertexCut().work(XXT, cutoff))) #These are the indexes of the IIDs to remove		

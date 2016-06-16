@@ -7,11 +7,11 @@ np.set_printoptions(precision=3, linewidth=200)
 import leapMain
 
 
-def findRelated(bed, outFile, cutoff):
+def findRelated(bed, outFile, cutoff, kinshipFile=None):
 
 	bed = leapUtils._fixupBed(bed)
 	
-	keepArr = leapUtils.findRelated(bed, cutoff)
+	keepArr = leapUtils.findRelated(bed, cutoff, kinshipFile)
 	if (outFile is not None):
 		print 'Printing output to', outFile
 		f = open(outFile, 'w')
@@ -25,6 +25,7 @@ if __name__ == '__main__':
 
 	parser = argparse.ArgumentParser()
 	parser.add_argument('--bfilesim', metavar='bfilesim', default=None, help='Binary plink file')
+	parser.add_argument('--kinship', metavar='kinsip', default=None, help='A kinship matrix represented in a text file. Note that this matrix must correspond exactly to the phenotypes file, unlike the bfilesim file option.')
 	parser.add_argument('--extractSim', metavar='extractSim', default=None, help='extractSim file')
 	parser.add_argument('--cutoff', metavar='cutoff', type=float, default=0.05, help='Relationship cutoff (default 0.05)')
 	parser.add_argument('--out', metavar='out', default=None, help='output file')
@@ -33,8 +34,10 @@ if __name__ == '__main__':
 	parser.add_argument('--missingPhenotype', metavar='missingPhenotype', default='-9', help='identifier for missing values (default: -9)')
 	args = parser.parse_args()
 
-	if (args.bfilesim is None): raise Exception('bfilesim must be supplied')
+	if (args.bfilesim is None and args.kinship is None): raise Exception('bfilesim or kinship must be supplied')
+	if (args.bfilesim is not None and args.kinship is not None): raise Exception('bfilesim and kinship cannot both be supplied')
 	if (args.out is None):   raise Exception('output file name must be supplied')
-	bed, _ = leapUtils.loadData(args.bfilesim, args.extractSim, args.pheno, args.missingPhenotype, loadSNPs=True, standardize=True)
-	leapMain.findRelated(bed, args.out, args.cutoff)
+	if (args.bfilesim is not None): bed, _ = leapUtils.loadData(args.bfilesim, args.extractSim, args.pheno, args.missingPhenotype, loadSNPs=True, standardize=True)
+	else: bed=None
+	leapMain.findRelated(bed, args.out, args.cutoff, args.kinship)
 	

@@ -1,10 +1,10 @@
-def eigenDecompose(bed, outFile=None):
+def eigenDecompose(bed, kinshipFile=None, outFile=None):
 	import eigenDecompose	
-	return eigenDecompose.eigenDecompose(bed, outFile)
+	return eigenDecompose.eigenDecompose(bed, kinshipFile, outFile)
 	
-def findRelated(bed, outFile=None, cutoff=0.05):
+def findRelated(bed, outFile=None, cutoff=0.05, kinshipFile=None):
 	import findRelated
-	return findRelated.findRelated(bed, outFile, cutoff)
+	return findRelated.findRelated(bed, outFile, cutoff, kinshipFile)
 
 def calcH2(pheno, prev, eigen, keepArr=None, covar=None, numRemovePCs=10, lowtail=False):
 	import calc_h2
