@@ -1,6 +1,6 @@
-def eigenDecompose(bed, kinshipFile=None, outFile=None):
+def eigenDecompose(bed, kinshipFile=None, outFile=None, ignore_neig=False):
 	import eigenDecompose	
-	return eigenDecompose.eigenDecompose(bed, kinshipFile, outFile)
+	return eigenDecompose.eigenDecompose(bed, kinshipFile, outFile, ignore_neig)
 	
 def findRelated(bed, outFile=None, cutoff=0.05, kinshipFile=None):
 	import findRelated

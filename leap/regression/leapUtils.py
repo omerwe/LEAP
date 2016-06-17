@@ -92,11 +92,11 @@ def findRelated(bed, cutoff, kinshipFile=None):
 	
 	
 	
-def eigenDecompose(XXT):
+def eigenDecompose(XXT, ignore_neig=False):
 	t0 = time.time()
 	print 'Computing eigendecomposition...'
 	s,U = la.eigh(XXT)
-	if (np.min(s) < -1e-4): raise Exception('Negative eigenvalues found')
+	if (not ignore_neig and (np.min(s) < -1e-4)): raise Exception('Negative eigenvalues found')
 	s[s<0]=0	
 	ind = np.argsort(s)
 	ind = ind[s>1e-12]

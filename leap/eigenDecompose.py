@@ -7,7 +7,7 @@ import scipy.linalg.blas as blas
 import leapMain
 np.set_printoptions(precision=3, linewidth=200)
 
-def eigenDecompose(bed, kinshipFile=None, outFile=None):
+def eigenDecompose(bed, kinshipFile=None, outFile=None, ignore_neig=False):
 
 	if (kinshipFile is None):
 		#Compute kinship matrix
@@ -20,7 +20,7 @@ def eigenDecompose(bed, kinshipFile=None, outFile=None):
 		XXT = np.loadtxt(kinshipFile)
 
 	#Compute eigendecomposition
-	S,U = leapUtils.eigenDecompose(XXT)
+	S,U = leapUtils.eigenDecompose(XXT, ignore_neig)
 	if (outFile is not None): np.savez_compressed(outFile, arr_0=U, arr_1=S, XXT=XXT)	
 	eigen = dict([])
 	eigen['XXT'] = XXT
@@ -39,6 +39,7 @@ if __name__ == '__main__':
 	parser.add_argument('--out', metavar='out', default=None, help='output file')
 	parser.add_argument('--pheno', metavar='pheno', default=None, help='Phenotypes file (optional), only used for identifying unphenotyped individuals')
 	parser.add_argument('--missingPhenotype', metavar='missingPhenotype', default='-9', help='identifier for missing values (default: -9)')
+	parser.add_argument('--ignore_neig', metavar='ignore_neig', type=int, default=0, help='if set to 1, negative eigenvalues will be set to 0 and consequently ignored.')
 	args = parser.parse_args()
 	
 	if (args.bfilesim is None and args.kinship is None): raise Exception('bfilesim or kinship must be supplied')
@@ -49,5 +50,5 @@ if __name__ == '__main__':
 	if (args.bfilesim is not None): bed, _ = leapUtils.loadData(args.bfilesim, args.extractSim, args.pheno, args.missingPhenotype, loadSNPs=True)
 	else: bed=None
 	
-	leapMain.eigenDecompose(bed, kinshipFile=args.kinship, outFile=args.out)
+	leapMain.eigenDecompose(bed, kinshipFile=args.kinship, outFile=args.out, ignore_neig=args.ignore_neig>0)
 
