@@ -31,7 +31,7 @@ for chrom in chromosomes:
 	eigen = leapMain.eigenDecompose(bedExclude, outFile=eigenFile)
 	
 	#compute heritability explained by this data
-	h2 = leapMain.calcH2(phenoFile, prevalence, eigen, keepArr=indsToKeep, h2coeff=1.0)
+	h2 = leapMain.calcH2(phenoFile, prevalence, eigen, keepArr=indsToKeep)
 	
 	#Compute liabilities explained by this data
 	liabs = leapMain.probit(bedExclude, phenoFile, h2, prevalence, eigen, keepArr=indsToKeep)
