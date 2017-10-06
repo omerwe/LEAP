@@ -46,12 +46,12 @@ if __name__ == '__main__':
 	bedSim, _ = leapUtils.loadData(args.bfilesim, args.extractSim, args.pheno, args.missingPhenotype, loadSNPs=True)
 	bedTest, _ = leapUtils.loadData(args.bfile, args.extract, args.pheno, args.missingPhenotype, loadSNPs=True)
 
-	#Read covariates
-	if (args.covar is not None):		
-		covar = leapUtils.loadCovars(bed, covar)			
-		print 'Read', covarsMat.shape[1], 'covariates from file'
-	else: covar = None
+	# #Read covariates
+	# if (args.covar is not None):		
+		# covar = leapUtils.loadCovars(bedSim, args.covar)			
+		# print 'Read', covar.shape[1], 'covariates from file'
+	# else: covar = None
 	
-	leapMain.leapGwas(bedSim, bedTest, args.pheno, args.h2, args.out, eigenFile=args.eigen, covar=covar)
+	leapMain.leapGwas(bedSim, bedTest, args.pheno, args.h2, args.out, eigenFile=args.eigen, covar=args.covar)
 
 	
