@@ -15,7 +15,7 @@ np.set_printoptions(precision=3, linewidth=200)
 
 
 def loadData(bfile, extractSim, phenoFile, missingPhenotype='-9', loadSNPs=False, standardize=True):
-	bed = Bed(bfile)
+	bed = Bed(bfile, count_A1=True)
 	
 	if (extractSim is not None):
 		f = open(extractSim)
@@ -155,13 +155,13 @@ def getSNPCovarsMatrix(bed, resfile, pthresh, mindist):
 	
 	
 def getExcludedChromosome(bfile, chrom):
-	bed = Bed(bfile)	
+	bed = Bed(bfile, count_A1=True)	
 	indsToKeep = (bed.pos[:,0] != chrom)
 	bed = bed[:, indsToKeep]	
 	return bed.read().standardize()
 	
 def getChromosome(bfile, chrom):
-	bed = Bed(bfile)
+	bed = Bed(bfile, count_A1=True)
 	indsToKeep = (bed.pos[:,0] == chrom)
 	bed = bed[:, indsToKeep]	
 	return bed.read().standardize()
@@ -174,7 +174,7 @@ def _fixupBedAndPheno(bed, pheno, missingPhenotype='-9'):
 	
 def _fixupBed(bed):
 	if isinstance(bed, str):
-		return Bed(bed).read().standardize()
+		return Bed(bed, count_A1=True).read().standardize()
 	else: return bed
 
 def _fixup_pheno(pheno, bed=None, missingPhenotype='-9'):
