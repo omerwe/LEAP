@@ -110,6 +110,6 @@ The dataset was simulated with 50% heritability and  0.1% prevalence. It include
 -----------------
 Contact
 ---------
-For questions and comments, please contact Omer Weissbrod at omerw[at]cs.technion.ac.il
+For questions and comments, please contact Omer Weissbrod at oweissbrod[at]hsph.harvard.edu
 
 
