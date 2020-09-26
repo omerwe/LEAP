@@ -26,7 +26,7 @@ To verify that everything is correctly installed, please run the script test.py.
 Usage instructions
 ----------------------
 There are two ways to run LEAP.
-The first is via a Python API. A detailed explanation about this option is provided in the [LEAP Ipython notebook](http://nbviewer.ipython.org/github.com/omerwe/LEAP/blob/master/Leap_example.ipynb).
+The first is via a Python API. A detailed explanation about this option is provided in the [LEAP Ipython notebook](https://nbviewer.jupyter.org/github/omerwe/LEAP/blob/master/Leap_example.ipynb).
 
 The second option is to run LEAP though a series of Python scripts, as detailed below. This option is more suitable for those not familiar with Python. The script leap_pipeline.sh runs the full LEAP pipeline on a small example dataset, and can be used for reference.
  
