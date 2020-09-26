@@ -10,39 +10,27 @@ LEAP was published in:
 ------------------
 Installation
 ------------------
-The easiest way to install LEAP is via pip, by typing the command:
-```shell
-pip install --user leap_gwas
-```
-
-Typically, the LEAP scripts will be installed at:
-```
-~/.local/lib/python2.7/site-packages/LEAP/
-```
-
-LEAP is particularly easy to install using the [Anaconda Python distribution](https://store.continuum.io/cshop/anaconda). The [numerically optimized version](http://continuum.io/blog/mkl-optimizations) of Anaconda can speed LEAP up substantially.
-
-Alternatively (if numerically optimized Anaconda can't be installed), for very fast performance it is recommended to have an optimized version of Numpy/Scipy [installed on your system](http://www.scipy.org/scipylib/building), using optimized numerical libraries such as [OpenBLAS](http://www.openblas.net) or [Intel MKL](https://software.intel.com/en-us/intel-mkl) (see [Compilation instructions for scipy with Intel MKL)](https://software.intel.com/en-us/articles/numpyscipy-with-intel-mkl).
-
-To install LEAP manually, you need the following dependencies:
-* Python 2.7
+LEAP has the following dependencies:
+* Python 3.6
 * [Numpy](http://www.numpy.org/) and [Scipy](http://www.scipy.org/)
 * [Scikits-learn](http://scikit-learn.org/stable/)
-* The Python [FaST-LMM package](https://github.com/MicrosoftGenomics/FaST-LMM).
+* The Python [FaST-LMM package](https://github.com/fastlmm/FaST-LMM).
 
-Please make sure these are installed prior to using LEAP.
-To verify that everything is correctly installed, please run the script test.py in the regression directory. It will run a small example analysis and print an error message if any problem is found.
+After installind these dependencies, you can install LEAP via:
+`git clone https://github.com/omerwe/LEAP`
+
+To verify that everything is correctly installed, please run the script test.py. It will run a small example analysis and print an error message if any problem is found.
  
  
 ------------------
 Usage instructions
 ----------------------
 There are two ways to run LEAP.
-The first is via a Python API. A detailed explanation about this option is provided in the [LEAP Ipython notebook](http://nbviewer.ipython.org/github/omerwe/LEAP/blob/master/leap/regression/Leap_example.ipynb).
+The first is via a Python API. A detailed explanation about this option is provided in the [LEAP Ipython notebook](http://nbviewer.ipython.org/github.com/omerwe/LEAP/blob/master/Leap_example.ipynb).
 
 The second option is to run LEAP though a series of Python scripts, as detailed below. This option is more suitable for those not familiar with Python. The script leap_pipeline.sh runs the full LEAP pipeline on a small example dataset, and can be used for reference.
  
-Generally, LEAP uses the same file formats as [FaST-LMM](https://github.com/MicrosoftGenomics/FaST-LMM).
+Generally, LEAP uses the same file formats as [FaST-LMM](https://github.com/fastlmm/FaST-LMM).
 Namely, input files are in [binary Plink format](http://pngu.mgh.harvard.edu/~purcell/plink/data.shtml#bed).
 When there is a contradiction between file formats used by Plink and by FastLMM, LEAP uses the convention adopted by FastLMM.
 Explanations about the parameters used by all the scripts can be seen by typing
