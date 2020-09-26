@@ -31,7 +31,7 @@ The first is via a Python API. A detailed explanation about this option is provi
 The second option is to run LEAP though a series of Python scripts, as detailed below. This option is more suitable for those not familiar with Python. The script leap_pipeline.sh runs the full LEAP pipeline on a small example dataset, and can be used for reference.
  
 Generally, LEAP uses the same file formats as [FaST-LMM](https://github.com/fastlmm/FaST-LMM).
-Namely, input files are in [binary Plink format](http://pngu.mgh.harvard.edu/~purcell/plink/data.shtml#bed).
+Namely, input files are in [binary Plink format](http://zzz.bwh.harvard.edu/plink/binary.shtml).
 When there is a contradiction between file formats used by Plink and by FastLMM, LEAP uses the convention adopted by FastLMM.
 Explanations about the parameters used by all the scripts can be seen by typing
 ```
