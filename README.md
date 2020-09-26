@@ -55,7 +55,7 @@ python eigenDecompose.py --bfilesim <Plink base file> --out <output file> [--ext
 ```
 This script computes a kinship matrix and its eigendecomposition, and saves them to speed up subsequent stages. It is recommended to perform a leave-one-chromosome-out (LOCO) analysis by computing a different kinship matrix for each chromosome, each one consisting of all SNPs except those on the selected chromosome. The optional extractSim file is a text file with a list of SNP names (one SNP per line) to facilitate this. The optional phenotype file is only used to exclude individuals with an unknown phenotype.
  
-**3) Compute heritability using the method of [Golan et al.](http://www.pnas.org/content/111/49/E5272.long):**
+**3) Compute heritability using [PCGC regression](http://www.pnas.org/content/111/49/E5272.long):**
 ```
 python calc_h2.py --bfilesim <Plink base file> --prev <prevalence> --pheno <phenotype file> --h2coeff 1.0 [--eigen <eigen file> --extractSim <SNPs used for heritability estimation>  --related <relatedness file> --h2coeff <heritability coefficient>]
 ```
@@ -99,6 +99,6 @@ The dataset was simulated with 50% heritability and  0.1% prevalence. It include
 -----------------
 Contact
 ---------
-For questions and comments, please contact Omer Weissbrod at omerw[at]cs.technion.ac.il
+For questions and comments, please create a Github issue.
 
 
