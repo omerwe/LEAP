@@ -2,9 +2,9 @@ import numpy as np
 import argparse
 import time
 import scipy.linalg.blas as blas
-import leapUtils
+from . import leapUtils
 np.set_printoptions(precision=3, linewidth=200)
-import leapMain
+from . import leapMain
 
 
 def findRelated(bed, outFile, cutoff, kinshipFile=None):
@@ -13,7 +13,7 @@ def findRelated(bed, outFile, cutoff, kinshipFile=None):
 	
 	keepArr = leapUtils.findRelated(bed, cutoff, kinshipFile)
 	if (outFile is not None):
-		print 'Printing output to', outFile
+		print('Printing output to', outFile)
 		f = open(outFile, 'w')
 		for i, (fid,iid) in enumerate(bed.iid):
 			if (keepArr[i]): f.write(fid + ' ' + iid + ' 0\n')

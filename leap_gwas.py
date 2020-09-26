@@ -2,8 +2,8 @@ import numpy as np
 import time
 import sys
 import argparse
-import leapUtils
-import leapMain
+from . import leapUtils
+from . import leapMain
 import fastlmm.association
 np.set_printoptions(precision=4, linewidth=200)
 
@@ -16,7 +16,7 @@ def gwas(bedSim, bedTest, pheno, h2, outFile, eigenFile, covar):
 	#Run GWAS	
 	logdelta = np.log(1.0/h2 - 1)
 	G0 = (bedSim if eigenFile is None else None)
-	print 'Performing LEAP GWAS...'
+	print('Performing LEAP GWAS...')
 	results_df = fastlmm.association.single_snp(bedTest, pheno, G0=G0, covar=covar, output_file_name=outFile, log_delta=logdelta, cache_file=eigenFile)
 	return results_df
 	

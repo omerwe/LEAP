@@ -23,7 +23,7 @@ def loadData(bfile, extractSim, phenoFile, missingPhenotype='-9', loadSNPs=False
 		extractSnpsSet = set([])
 		for l in csvReader: extractSnpsSet.add(l[0])			
 		f.close()		
-		keepSnpsInds = [i for i in xrange(bed.sid.shape[0]) if bed.sid[i] in extractSnpsSet]		
+		keepSnpsInds = [i for i in range(bed.sid.shape[0]) if bed.sid[i] in extractSnpsSet]		
 		bed = bed[:, keepSnpsInds]
 		
 	phe = None
@@ -53,7 +53,7 @@ def checkIntersection(bed, fileDict, fileStr, checkSuperSet=False):
 	
 	intersectSet = bedSet.intersection(fileSet)
 	if (len(intersectSet) != len (bedSet)):
-		print len(intersectSet), 'individuals appear in both the plink file and the', fileStr, 'file'
+		print(len(intersectSet), 'individuals appear in both the plink file and the', fileStr, 'file')
 
 	
 def symmetrize(a):
@@ -67,23 +67,23 @@ def loadRelatedFile(bed, relFile):
 	_, relatedDict = pstutil.intersect_apply([bed, relatedDict])
 	related = relatedDict['vals']
 	keepArr = (related < 0.5)
-	print np.sum(~keepArr), 'individuals will be removed due to high relatedness'
+	print(np.sum(~keepArr), 'individuals will be removed due to high relatedness')
 	return keepArr
 	
 	
 def findRelated(bed, cutoff, kinshipFile=None):
 
 	if (kinshipFile is None):
-		print 'Computing kinship matrix...'
+		print('Computing kinship matrix...')
 		t0 = time.time()	
 		XXT = symmetrize(blas.dsyrk(1.0, bed.val, lower=1) / bed.val.shape[1])
-		print 'Done in %0.2f'%(time.time()-t0), 'seconds'
+		print('Done in %0.2f'%(time.time()-t0), 'seconds')
 	else:
 		XXT = np.loadtxt(kinshipFile)
 
 	#Find related individuals
 	removeSet = set(np.sort(vc.VertexCut().work(XXT, cutoff))) #These are the indexes of the IIDs to remove		
-	print 'Marking', len(removeSet), 'individuals to be removed due to high relatedness'
+	print('Marking', len(removeSet), 'individuals to be removed due to high relatedness')
 	
 	#keepArr = np.array([(1 if iid in keepSet else 0) for iid in bed.iid], dtype=bool)	
 	keepArr = np.ones(bed.iid.shape[0], dtype=bool)
@@ -94,7 +94,7 @@ def findRelated(bed, cutoff, kinshipFile=None):
 	
 def eigenDecompose(XXT, ignore_neig=False):
 	t0 = time.time()
-	print 'Computing eigendecomposition...'
+	print('Computing eigendecomposition...')
 	s,U = la.eigh(XXT)
 	if (not ignore_neig and (np.min(s) < -1e-4)): raise Exception('Negative eigenvalues found')
 	s[s<0]=0	
@@ -102,7 +102,7 @@ def eigenDecompose(XXT, ignore_neig=False):
 	ind = ind[s>1e-12]
 	U = U[:, ind]
 	s = s[ind]
-	print 'Done in %0.2f'%(time.time()-t0), 'seconds'
+	print('Done in %0.2f'%(time.time()-t0), 'seconds')
 	return s,U
 	
 	
@@ -120,7 +120,7 @@ def getSNPCovarsMatrix(bed, resfile, pthresh, mindist):
 
 	f = open(resfile)
 	csvReader = csv.reader(f, delimiter="\t")
-	csvReader.next()	
+	next(csvReader)	
 	significantSNPs = []
 	significantSNPNames = []
 	lastPval = 0
@@ -134,7 +134,7 @@ def getSNPCovarsMatrix(bed, resfile, pthresh, mindist):
 		significantSNPNames.append(snpName)
 		if (mindist == 0):
 			significantSNPs.append(snpNameToNumDict[snpName])
-			print 'Using SNP', snpName, 'with p<%0.2e'%pVal, 'as a fixed effect'
+			print('Using SNP', snpName, 'with p<%0.2e'%pVal, 'as a fixed effect')
 		else:
 			posArr = bed.pos[snpNameToNumDict[snpName]]
 			chrom, pos = posArr[0], int(posArr[2])				
@@ -146,7 +146,7 @@ def getSNPCovarsMatrix(bed, resfile, pthresh, mindist):
 			if addSNP:
 				significantSNPs.append(snpNameToNumDict[snpName])
 				featuresPosList.append((chrom, pos))
-				print 'Using SNP', snpName, '('+str(int(chrom))+':'+str(pos)+') with p<%0.2e'%pVal, 'as a fixed effect'
+				print('Using SNP', snpName, '('+str(int(chrom))+':'+str(pos)+') with p<%0.2e'%pVal, 'as a fixed effect')
 	f.close()
 
 	snpCovarsMat = bed.val[:, significantSNPs]
@@ -242,7 +242,7 @@ def computeCovar(bed, shrinkMethod, fitIndividuals):
 	if (shrinkMethod in ['lw', 'oas', 'l1', 'cv']):
 		import sklearn.covariance as cov
 		t0 = time.time()
-		print 'Estimating shrunk covariance using', shrinkMethod, 'estimator...'
+		print('Estimating shrunk covariance using', shrinkMethod, 'estimator...')
 				
 		if (shrinkMethod == 'lw'): covEstimator = cov.LedoitWolf(assume_centered=True, block_size = 5*bed.val.shape[0])
 		elif (shrinkMethod == 'oas'): covEstimator = cov.OAS(assume_centered=True)
@@ -256,22 +256,22 @@ def computeCovar(bed, shrinkMethod, fitIndividuals):
 		covEstimator.fit(bed.val[fitIndividuals, :].T)
 		if (shrinkMethod == 'l1'):
 			alpha = covEstimator.alpha_
-			print 'l1 alpha chosen:', alpha
+			print('l1 alpha chosen:', alpha)
 			covEstimator2 = cov.GraphLasso(alpha=alpha, assume_centered=True, verbose=True)
 		else:
 			if (shrinkMethod == 'cv'): shrinkEstimator = clf.best_params_['shrinkage']
 			else: shrinkEstimator = covEstimator.shrinkage_
-			print 'shrinkage estimator:', shrinkEstimator
+			print('shrinkage estimator:', shrinkEstimator)
 			covEstimator2 = cov.ShrunkCovariance(shrinkage=shrinkEstimator, assume_centered=True)
 		covEstimator2.fit(bed.val.T)
 		XXT = covEstimator2.covariance_ * bed.val.shape[1]
-		print 'Done in %0.2f'%(time.time()-t0), 'seconds'
+		print('Done in %0.2f'%(time.time()-t0), 'seconds')
 			
 	else:
-		print 'Computing kinship matrix...'	
+		print('Computing kinship matrix...')	
 		t0 = time.time()
 		XXT = symmetrize(blas.dsyrk(1.0, bed.val, lower=1))
-		print 'Done in %0.2f'%(time.time()-t0), 'seconds'		
+		print('Done in %0.2f'%(time.time()-t0), 'seconds')		
 		try: shrinkParam = float(shrinkMethod)
 		except: shrinkParam = -1
 		if (shrinkMethod == 'mylw'):
@@ -282,7 +282,7 @@ def computeCovar(bed, shrinkMethod, fitIndividuals):
 			sER2 = (temp.sum() - np.diag(temp).sum()) / bed.val.shape[1]
 			shrinkParam = (sER2 - sE2R) / (sE2R * (bed.val.shape[1]-1))		
 		if (shrinkParam > 0):
-			print 'shrinkage estimator:', 1-shrinkParam
+			print('shrinkage estimator:', 1-shrinkParam)
 			XXT = (1-shrinkParam)*XXT + bed.val.shape[1]*shrinkParam*np.eye(XXT.shape[0])
 	
 	return XXT
@@ -295,17 +295,17 @@ def standardize(X, method, optionsDict):
 	if (method == 'frq'):
 		empMean = X.mean(axis=0) / 2.0
 		X[:, empMean>0.5] = 2 - X[:, empMean>0.5]	
-		print 'regularizng SNPs according to frq file...'
+		print('regularizng SNPs according to frq file...')
 		frqFile = (optionsDict['bfilesim']+'.frq' if (optionsDict['frq'] is None) else optionsDict['frq'])
 		mafs = np.loadtxt(frqFile, usecols=[1,2]).mean(axis=1)
 		snpsMean = 2*mafs
 		snpsStd = np.sqrt(2*mafs*(1-mafs))	
 	elif (method == 'related'):
 		if (optionsDict['related'] is None): raise Exception('related file not supplied')
-		print 'regularizng SNPs according to non-related individuals...'
+		print('regularizng SNPs according to non-related individuals...')
 		relLines = np.loadtxt(optionsDict['related'], usecols=[2])	
 		keepArr = (relLines != 1)
-		print 'Excluding', np.sum(~keepArr), 'from the covariance matrix standardization'
+		print('Excluding', np.sum(~keepArr), 'from the covariance matrix standardization')
 		snpsMean = X[keepArr, :].mean(axis=0)
 		snpsStd = X[keepArr, :].std(axis=0)
 		fitIndividuals = keepArr
@@ -313,7 +313,7 @@ def standardize(X, method, optionsDict):
 		phe = optionsDict['pheno']
 		pheThreshold = phe.mean()
 		controls = (phe<pheThreshold)		
-		print 'regularizng SNPs according to controls...'
+		print('regularizng SNPs according to controls...')
 		snpsMean = X[controls, :].mean(axis=0)
 		snpsStd = X[controls, :].std(axis=0)
 		fitIndividuals = controls

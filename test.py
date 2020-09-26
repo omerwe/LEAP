@@ -4,8 +4,8 @@ import os
 import sys
 import pandas as pd
 import numpy as np
-import leap.leapUtils as leapUtils
-import leap.leapMain as leapMain
+import leapUtils
+import leapMain
 
 class TestLeap(unittest.TestCase):
 
@@ -22,7 +22,7 @@ class TestLeap(unittest.TestCase):
 		
 		#Create eigendecompositions
 		logging.info("Creating eigendecomposition files")		
-		for i in xrange(1,11):
+		for i in range(1,11):
 			output_file = os.path.abspath(os.path.join(self.tempout_dir, 'dataset1_nochr{}.npz'.format(i)))
 			extractSim = 'dataset1/extracts/nochr{0}_extract.txt'.format(i)
 			bed, _ = leapUtils.loadData(self.bedbase, extractSim, self.phen_fn, loadSNPs=True)
@@ -63,7 +63,7 @@ class TestLeap(unittest.TestCase):
 		bed, _ = leapUtils.loadData(self.bedbase, None, self.phen_fn, loadSNPs=False)
 		keepArr = leapUtils.loadRelatedFile(bed, related_file)
 		
-		for i in xrange(1,11):
+		for i in range(1,11):
 			h2_file = os.path.abspath(os.path.join(self.gold_dir, 'dataset1_nochr{0}.h2'.format(i)))
 			eigen_file = os.path.abspath(os.path.join(self.tempout_dir, 'dataset1_nochr{}.npz'.format(i)))
 			eigen = np.load(eigen_file)
@@ -79,7 +79,7 @@ class TestLeap(unittest.TestCase):
 		bed, _ = leapUtils.loadData(self.bedbase, None, self.phen_fn, loadSNPs=False)
 		keepArr = leapUtils.loadRelatedFile(bed, related_file)
 		
-		for i in xrange(1,11):
+		for i in range(1,11):
 			h2_file = os.path.abspath(os.path.join(self.gold_dir, 'dataset1_nochr{0}.h2'.format(i)))
 			h2 = np.loadtxt(h2_file, usecols=[0])
 			eigen_file = os.path.abspath(os.path.join(self.tempout_dir, 'dataset1_nochr{}.npz'.format(i)))
@@ -95,7 +95,7 @@ class TestLeap(unittest.TestCase):
 	def test_gwas(self):
 		logging.info("Leap test_gwas")		
 		
-		for i in xrange(1,11):
+		for i in range(1,11):
 			h2_file = os.path.abspath(os.path.join(self.gold_dir, 'dataset1_nochr{0}.h2'.format(i)))
 			h2 = np.loadtxt(h2_file, usecols=[0])			
 			ref_file = os.path.abspath(os.path.join(self.gold_dir, 'dataset1_nochr{}.gwas.out.txt'.format(i)))
@@ -119,7 +119,7 @@ class TestLeap(unittest.TestCase):
 		assert len(frame1) == len(frame2), '# of lines differs from file "{0}"'.format(file2)
 		for row_i, row1 in frame1.iterrows():			
 			row2 = frame2[(frame2['fid']==row1['fid']) & (frame2['iid']==row1['iid'])].iloc[0]
-			for k in row1.keys():
+			for k in list(row1.keys()):
 				assert row1[k]==row2[k], "different data for individual '{0}' '{1}'".format(row1['fid'], row1['iid'])
 				
 				

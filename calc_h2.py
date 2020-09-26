@@ -6,8 +6,8 @@ import sklearn.linear_model
 import time
 import sys
 np.set_printoptions(precision=3, linewidth=200)
-import leapUtils
-import leapMain
+from . import leapUtils
+from . import leapMain
 
 
 def calcLiabThreholds(U, S, keepArr, phe, numRemovePCs, prev, covar):
@@ -38,7 +38,7 @@ def calcLiabThreholds(U, S, keepArr, phe, numRemovePCs, prev, covar):
 	
 def calcH2Continuous_twotails(XXT, phe, keepArr, prev):
 
-	print 'computing h2 for a two-tails ascertained study...'
+	print('computing h2 for a two-tails ascertained study...')
 	
 	XXT = XXT[np.ix_(keepArr, keepArr)]
 	phe = phe[keepArr]	
@@ -151,7 +151,7 @@ def calc_h2(pheno, prev, eigen, keepArr, covar, numRemovePCs, lowtail):
 	if (numRemovePCs > 0):
 		if (eigen is None): S,U = leapUtils.eigenDecompose(XXT)
 		else: S, U = eigen['arr_1'], eigen['arr_0']		
-		print 'Removing the top', numRemovePCs, 'PCs from the kinship matrix'
+		print('Removing the top', numRemovePCs, 'PCs from the kinship matrix')
 		XXT -= (U[:, -numRemovePCs:]*S[-numRemovePCs:]).dot(U[:, -numRemovePCs:].T)		
 	else:
 		U, S = None, None
@@ -162,7 +162,7 @@ def calc_h2(pheno, prev, eigen, keepArr, covar, numRemovePCs, lowtail):
 	isCaseControl = (pheUnique.shape[0] == 2)
 	
 	if isCaseControl:
-		print 'Computing h2 for a binary phenotype'
+		print('Computing h2 for a binary phenotype')
 		pheMean = phe.mean()	
 		phe[phe <= pheMean] = 0
 		phe[phe > pheMean] = 1
@@ -172,14 +172,14 @@ def calc_h2(pheno, prev, eigen, keepArr, covar, numRemovePCs, lowtail):
 		else: h2 = calcH2Binary(XXT, phe, None, None, keepArr, prev)
 	else:
 		if (covar is not None): raise Exception('Covariates with a continuous phenotype are currently not supported')
-		print 'Computing h2 for a continuous phenotype'
+		print('Computing h2 for a continuous phenotype')
 		if (not lowtail): h2 = calcH2Continuous(XXT, phe, keepArr, prev)
 		else: h2 = calcH2Continuous_twotails(XXT, phe, keepArr, prev)
 		
 	if (h2 <= 0): raise Exception("Negative heritability found. Exitting...")	
 	if (np.isnan(h2)): raise Exception("Invalid heritability estimate. Please double-check your input for any errors.")	
 		
-	print 'h2: %0.6f'%h2
+	print('h2: %0.6f'%h2)
 	return h2
 
 
@@ -211,7 +211,7 @@ if __name__ == '__main__':
 	#Read/create eigendecomposition
 	if (args.eigen is not None): eigen = np.load(args.eigen)
 	else:
-		import eigenDecompose
+		from . import eigenDecompose
 		eigen = eigenDecompose.eigenDecompose(bed)	
 
 	#Compute relatedness
@@ -230,7 +230,7 @@ if __name__ == '__main__':
 		covar = leapUtils.loadCovars(bed, args.covar)	
 		covar -= covar.mean()
 		covar /= covar.std()
-		print 'Read', covar.shape[1], 'covariates from file'
+		print('Read', covar.shape[1], 'covariates from file')
 	else:
 		covar = None		
 	

@@ -2,9 +2,9 @@ import numpy as np
 import argparse
 import scipy.linalg as la
 import time
-import leapUtils
+from . import leapUtils
 import scipy.linalg.blas as blas
-import leapMain
+from . import leapMain
 np.set_printoptions(precision=3, linewidth=200)
 
 def eigenDecompose(bed, kinshipFile=None, outFile=None, ignore_neig=False):
@@ -13,9 +13,9 @@ def eigenDecompose(bed, kinshipFile=None, outFile=None, ignore_neig=False):
 		#Compute kinship matrix
 		bed = leapUtils._fixupBed(bed)
 		t0 = time.time()
-		print 'Computing kinship matrix...'	
+		print('Computing kinship matrix...')	
 		XXT = leapUtils.symmetrize(blas.dsyrk(1.0, bed.val, lower=1)) / bed.val.shape[1]
-		print 'Done in %0.2f'%(time.time()-t0), 'seconds'
+		print('Done in %0.2f'%(time.time()-t0), 'seconds')
 	else:
 		XXT = np.loadtxt(kinshipFile)
 

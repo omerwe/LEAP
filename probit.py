@@ -7,8 +7,8 @@ import sys
 import argparse
 import scipy.optimize as opt
 import scipy.linalg.blas as blas
-import leapUtils
-import leapMain
+from . import leapUtils
+from . import leapMain
 np.set_printoptions(precision=6, linewidth=200)
 
 
@@ -63,13 +63,13 @@ def probitRegression(X, y, thresholds, numSNPs, numFixedFeatures, h2, useHess, m
 	jac= True
 	method = 'Newton-CG'
 	args = (X, cases, controls, thresholds, invRegParam, normPDF, h2)
-	print 'Beginning Probit regression...'
+	print('Beginning Probit regression...')
 	t0 = time.time()
 	optObj = opt.minimize(funcToSolve, x0=initBeta, args=args, jac=jac, method=method, hess=hess)
-	print 'Done in', '%0.2f'%(time.time()-t0), 'seconds'	
+	print('Done in', '%0.2f'%(time.time()-t0), 'seconds')	
 	if (not optObj.success):
-		print 'Optimization status:', optObj.status
-		print optObj.message
+		print('Optimization status:', optObj.status)
+		print(optObj.message)
 		if (nofail == 0): raise Exception('Probit regression failed with message: ' + optObj.message)
 	beta = optObj.x
 			
@@ -77,8 +77,8 @@ def probitRegression(X, y, thresholds, numSNPs, numFixedFeatures, h2, useHess, m
 	if (numFixedFeatures > 0):
 		thresholdsEM = np.zeros(X.shape[0]) + thresholds
 		
-		for i in xrange(maxFixedIters):
-			print 'Beginning fixed effects iteration', i+1
+		for i in range(maxFixedIters):
+			print('Beginning fixed effects iteration', i+1)
 			t0 = time.time()
 			prevBeta = beta.copy()
 			
@@ -87,19 +87,19 @@ def probitRegression(X, y, thresholds, numSNPs, numFixedFeatures, h2, useHess, m
 			args = (X[:, :numFixedFeatures], cases, controls, thresholdsTemp, 0, normPDF, h2)
 				
 			optObj = opt.minimize(funcToSolve, x0=beta[:numFixedFeatures], args=args, jac=True, method=method, hess=hess)
-			if (not optObj.success): print optObj.message; #raise Exception('Learning failed with message: ' + optObj.message)
+			if (not optObj.success): print(optObj.message); #raise Exception('Learning failed with message: ' + optObj.message)
 			beta[:numFixedFeatures] = optObj.x
 			
 			#Learn random effects
 			thresholdsTemp = thresholdsEM - X[:, :numFixedFeatures].dot(beta[:numFixedFeatures])			
 			args = (X[:, numFixedFeatures:], cases, controls, thresholdsTemp, invRegParam, normPDF, h2)
 			optObj = opt.minimize(funcToSolve, x0=beta[numFixedFeatures:], args=args, jac=True, method=method, hess=hess)
-			if (not optObj.success): print optObj.message; #raise Exception('Learning failed with message: ' + optObj.message)				
+			if (not optObj.success): print(optObj.message); #raise Exception('Learning failed with message: ' + optObj.message)				
 			beta[numFixedFeatures:] = optObj.x
 			
 			diff = np.sqrt(np.mean(beta[:numFixedFeatures]**2 - prevBeta[:numFixedFeatures]**2))
-			print 'Done in', '%0.2f'%(time.time()-t0), 'seconds'
-			print 'Diff:', '%0.4e'%diff
+			print('Done in', '%0.2f'%(time.time()-t0), 'seconds')
+			print('Diff:', '%0.4e'%diff)
 			if (diff < epsilon): break
 	return beta
 	
@@ -123,7 +123,7 @@ def probit(bed, pheno, h2, prev, eigen, outFile, keepArr, covar, thresholds, nof
 	S = np.sqrt(S)
 	goodS = (S>mineig)
 	if (numSkipTopPCs > 0): goodS[-numSkipTopPCs:] = False
-	if (np.sum(~goodS) > 0): print 'Removing', np.sum(~goodS), 'PCs with low variance'	
+	if (np.sum(~goodS) > 0): print('Removing', np.sum(~goodS), 'PCs with low variance')	
 	G = U[:, goodS]*S[goodS]
 	
 	#Set binary vector
@@ -238,7 +238,7 @@ if __name__ == '__main__':
 	#Read/create eigendecomposition
 	if (args.eigen is not None): eigen = np.load(args.eigen)
 	else:
-		import eigenDecompose
+		from . import eigenDecompose
 		eigen = eigenDecompose.eigenDecompose(bed)	
 
 	#Compute relatedness
@@ -257,11 +257,11 @@ if __name__ == '__main__':
 	if (args.resfile is not None):	
 		bed_fixed, _ = leapUtils.loadData(args.bfile, args.extract, args.pheno, args.missingPhenotype, loadSNPs=True)
 		covar = leapUtils.getSNPCovarsMatrix(bed_fixed, args.resfile, args.pthresh, args.mindist)		
-		print 'using', covar.shape[1], 'SNPs as covariates'		
+		print('using', covar.shape[1], 'SNPs as covariates')		
 	#Read covar file
 	if (args.covar is not None):		
 		covarsMat = leapUtils.loadCovars(bed, args.covar)			
-		print 'Read', covarsMat.shape[1], 'covariates from file'
+		print('Read', covarsMat.shape[1], 'covariates from file')
 		if (covar is None): covar = covarsMat
 		else: covar = np.concatenate((covar, covarsMat), axis=1)
 		
